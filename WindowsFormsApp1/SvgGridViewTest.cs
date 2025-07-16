@@ -27,7 +27,7 @@ namespace WindowsFormsApp1
 		public async Task InitData()
 		{
 			List<SvgCompositionViewDto> dtos = new List<SvgCompositionViewDto>();
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				SvgCompositionViewDto dto = new SvgCompositionViewDto();
 				dto.ContentImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test.svg");

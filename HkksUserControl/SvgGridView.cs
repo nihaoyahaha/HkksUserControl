@@ -8,11 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace CustomControlsImitatingUWP
 {
 	public partial class SvgGridView : UserControl
 	{
+		private Color _insertCursorColor = Color.Coral;
 		private SvgCompositionViewDto[] _dtos;
 
 		private int _selectedIndex = -1;
@@ -47,6 +49,10 @@ namespace CustomControlsImitatingUWP
 					if (x != null)
 					{
 						x.SelectionChanged += OnSelected;
+						x.SvgCompositionViewDragDrop += OnDragDrop;
+						x.SvgCompositionViewDragEnter += OnDragEnter;
+						x.SvgCompositionViewDragOver += OnDragOver;
+						x.SvgCompositionViewDragLeave += OnDragLeave;
 						panel_Main.Controls.Add(x);
 					}
 				});
@@ -54,9 +60,22 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
+		private Rectangle _rectDragEnter = Rectangle.Empty;
+
+		private SvgCompositionViewInsertDirection _insertDirection = SvgCompositionViewInsertDirection.Null;
+
+		private bool _isDragOver = false;
+
 		public SvgGridView()
 		{
 			InitializeComponent();
+			DoubleBuffered = true;
+			typeof(Panel).InvokeMember(
+			"DoubleBuffered",
+			System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+			null,
+			panel_Main,
+			new object[] { true });
 		}
 
 		private void SetNumInfo()
@@ -64,32 +83,48 @@ namespace CustomControlsImitatingUWP
 			lb_numInfo.Text = $"{_selectedIndex + 1}/{_dataSouce.Count}";
 		}
 
-		private void OnSelected(object sender, MouseEventArgs e)
+		private void MoveSelectedItem(int indexToMove, int targetIndex, bool insertAfter)
 		{
-			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
-			if (obj != null) obj.Selected = false;
-			_selectedItem = sender as SvgCompositionView;
-			_selectedItem.Selected = true;
-			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
-			SetNumInfo();
-		}
+			var item = _dataSouce[indexToMove];
+			var control = panel_Main.Controls[indexToMove];
 
-		private void OnMousePressMove(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Left)
+			_dataSouce.RemoveAt(indexToMove);
+			panel_Main.Controls.RemoveAt(indexToMove);
+
+			int insertPosition = targetIndex;
+			if (insertAfter)
 			{
-				_selectedItem.DoDragDrop(_selectedItem, DragDropEffects.Move);
-			}	
+				if (indexToMove > targetIndex)
+				{
+					insertPosition++;
+				}
+			}
+			else
+			{
+				if (indexToMove < targetIndex)
+				{
+					insertPosition--;
+				}
+			}
+			_dataSouce.Insert(insertPosition, item);
+			panel_Main.Controls.Add(item);
+			panel_Main.Controls.SetChildIndex(control, insertPosition);
+			SetSelectedIndex(insertPosition);
 		}
 
 		public void Add(SvgCompositionView item)
 		{
 			if (item == null) return;
 			item.SelectionChanged += OnSelected;
+			item.SvgCompositionViewDragDrop += OnDragDrop;
+			item.SvgCompositionViewDragEnter += OnDragEnter;
+			item.SvgCompositionViewDragOver += OnDragOver;
+			item.SvgCompositionViewDragLeave += OnDragLeave;
 			_dataSouce.Add(item);
 			panel_Main.Controls.Add(item);
 			SetNumInfo();
 		}
+
 		private void SetItemDeletedState(SvgCompositionView item)
 		{
 			if (item == null) return;
@@ -106,6 +141,10 @@ namespace CustomControlsImitatingUWP
 				_dataSouce.Remove(item);
 				panel_Main.Controls.Remove(item);
 				item.SelectionChanged -= OnSelected;
+				item.SvgCompositionViewDragDrop -= OnDragDrop;
+				item.SvgCompositionViewDragEnter -= OnDragEnter;
+				item.SvgCompositionViewDragOver -= OnDragOver;
+				item.SvgCompositionViewDragLeave -= OnDragLeave;
 				item.DisposeImage();
 				item.Dispose();
 				item = null;
@@ -172,7 +211,8 @@ namespace CustomControlsImitatingUWP
 		public async Task BindAsync(params SvgCompositionViewDto[] dtos)
 		{
 			int index = 0;
-			dtos.ToList().ForEach(x => {
+			dtos.ToList().ForEach(x =>
+			{
 				x.Id = index;
 				index++;
 			});
@@ -266,6 +306,98 @@ namespace CustomControlsImitatingUWP
 
 		//当前页内数据后移
 		private void MoveSelectedItemsBackForward() => MoveSelectedItems(_selectedIndex + 1);
+
+		private void panel_Main_Paint(object sender, PaintEventArgs e)
+		{
+			if (_rectDragEnter != Rectangle.Empty)
+			{
+				DrawInsertCursor(e.Graphics);
+			}
+		}
+
+		private void DrawInsertCursor(Graphics g)
+		{
+			if (!_isDragOver) return;
+			using (Pen crossPen = new Pen(_insertCursorColor, 3))
+			{
+				Point p1 = Point.Empty;
+				Point p2 = Point.Empty;
+				if (_insertDirection == SvgCompositionViewInsertDirection.Left)
+				{
+					p1 = new Point(_rectDragEnter.X - 4, _rectDragEnter.Y);
+					p2 = new Point(_rectDragEnter.X - 4, _rectDragEnter.Y + _rectDragEnter.Height);
+				}
+				else
+				{
+					p1 = new Point(_rectDragEnter.X + _rectDragEnter.Width + 2, _rectDragEnter.Y);
+					p2 = new Point(_rectDragEnter.X + _rectDragEnter.Width + 2, _rectDragEnter.Y + _rectDragEnter.Height);
+				}
+
+				g.DrawLine(crossPen, p1, p2);
+			}
+		}
+
+		private void OnSelected(object sender, MouseEventArgs e)
+		{
+			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
+			if (obj != null) obj.Selected = false;
+			_selectedItem = sender as SvgCompositionView;
+			_selectedItem.Selected = true;
+			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
+			SetNumInfo();
+
+			panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
+		}
+
+		private void OnDragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(typeof(SvgCompositionView)))
+			{
+				e.Effect = DragDropEffects.Move;
+			}
+		}
+
+		private void OnDragDrop(object sender, DragEventArgs e)
+		{
+			var targetItem = sender as SvgCompositionView;
+			int targetIndex = _dataSouce.IndexOf(targetItem);
+			if (targetIndex == _selectedIndex) return;
+
+			Point clientPoint = targetItem.PointToClient(new Point(e.X, e.Y));
+			bool isLeftSide = clientPoint.X < targetItem.Width / 2;
+			MoveSelectedItem(_selectedIndex, targetIndex, !isLeftSide);
+			_insertDirection = SvgCompositionViewInsertDirection.Null;
+			_rectDragEnter = Rectangle.Empty;
+			_isDragOver = false;
+			panel_Main.Invalidate();
+		}
+
+		private void OnDragOver(object sender, DragEventArgs e)
+		{
+			if (!e.Data.GetDataPresent(typeof(SvgCompositionView))) 
+			{ 
+				return; 
+			}
+			_isDragOver = true;
+			var targetItem = sender as SvgCompositionView;
+			if (targetItem.Id == _selectedItem.Id) return;
+
+			_insertDirection = SvgCompositionViewInsertDirection.Null;
+			_rectDragEnter = Rectangle.Empty;
+			
+			Point clientPoint = targetItem.PointToClient(new Point(e.X, e.Y));
+			bool isLeftSide = clientPoint.X < targetItem.Width / 2;
+			_insertDirection = isLeftSide ? SvgCompositionViewInsertDirection.Left : SvgCompositionViewInsertDirection.Right;
+			_rectDragEnter = new Rectangle(targetItem.Location, targetItem.Size);
+			panel_Main.Invalidate();
+		}
+
+		private void OnDragLeave(object sender, EventArgs e)
+		{
+			_isDragOver = false;
+			panel_Main.Invalidate();
+		}
+
 
 	}
 }

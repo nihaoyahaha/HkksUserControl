@@ -154,6 +154,10 @@
 			this.Controls.Add(this.pic_Icon);
 			this.Name = "SvgCompositionView";
 			this.Size = new System.Drawing.Size(161, 200);
+			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.SvgCompositionView_DragDrop);
+			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.SvgCompositionView_DragEnter);
+			this.DragOver += new System.Windows.Forms.DragEventHandler(this.SvgCompositionView_DragOver);
+			this.DragLeave += new System.EventHandler(this.SvgCompositionView_DragLeave);
 			((System.ComponentModel.ISupportInitialize)(this.pic_svgImage)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pic_Icon)).EndInit();
 			this.ResumeLayout(false);

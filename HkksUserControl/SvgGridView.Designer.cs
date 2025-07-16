@@ -51,6 +51,7 @@
 			// 
 			// panel_Main
 			// 
+			this.panel_Main.AllowDrop = true;
 			this.panel_Main.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -58,8 +59,10 @@
 			this.panel_Main.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panel_Main.Location = new System.Drawing.Point(3, 32);
 			this.panel_Main.Name = "panel_Main";
+			this.panel_Main.Padding = new System.Windows.Forms.Padding(3);
 			this.panel_Main.Size = new System.Drawing.Size(382, 269);
 			this.panel_Main.TabIndex = 0;
+			this.panel_Main.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Main_Paint);
 			// 
 			// panel_Top
 			// 

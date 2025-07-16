@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Svg;
 using System.IO;
 using System.Web;
+using System.Diagnostics;
 
 namespace CustomControlsImitatingUWP
 {
@@ -88,7 +89,8 @@ namespace CustomControlsImitatingUWP
 		public bool IsDeleted
 		{
 			get { return _isDeleted; }
-			set { 
+			set
+			{
 				_isDeleted = value;
 				panel_Del.Visible = value;
 			}
@@ -97,14 +99,18 @@ namespace CustomControlsImitatingUWP
 		public int Id { get; set; }
 
 		public event EventHandler<MouseEventArgs> SelectionChanged;
+		public event EventHandler<DragEventArgs> SvgCompositionViewDragDrop;
+		public event EventHandler<DragEventArgs> SvgCompositionViewDragEnter;
+		public event EventHandler<DragEventArgs> SvgCompositionViewDragOver;
+		public event EventHandler<EventArgs> SvgCompositionViewDragLeave;
 
 		public SvgCompositionView()
 		{
 			InitializeComponent();
 			InitializeHoverEffect();
 			DoubleBuffered = true;
-			panel_Del.Size = new Size(Width-4,Height-4);
-			panel_Del.Location = new Point(1,1);
+			panel_Del.Size = new Size(Width - 4, Height - 4);
+			panel_Del.Location = new Point(1, 1);
 		}
 
 		private void InitContentImage(string filePath)
@@ -168,9 +174,10 @@ namespace CustomControlsImitatingUWP
 				lb_greenbk.Visible = true;
 				lb_inkCanvas.Visible = true;
 				_svgDoc = null;
-				 await Task.Run(() => {
+				await Task.Run(() =>
+				{
 					_svgDoc = SvgDocument.Open(_contentImagePath);
-					 pic_svgImage.Image = _svgDoc.Draw();
+					pic_svgImage.Image = _svgDoc.Draw();
 					_svgDoc.Children.ToList().ForEach(x =>
 					{
 						if (x is SvgImage)
@@ -195,7 +202,7 @@ namespace CustomControlsImitatingUWP
 						}
 					});
 				});
-				
+
 			}
 			else
 			{
@@ -254,11 +261,11 @@ namespace CustomControlsImitatingUWP
 		}
 
 		private void OnControlMouseDown(object sender, MouseEventArgs e)
-		{ 
+		{
 			_isHovered = true;
 			_isSelected = true;
 			_borderColor = Color.FromArgb(0, 120, 215);
-			SelectionChanged?.Invoke(this,e);
+			SelectionChanged?.Invoke(this, e);
 			Invalidate();
 		}
 
@@ -273,7 +280,6 @@ namespace CustomControlsImitatingUWP
 			{
 				DrawBorder(e.Graphics);
 			}
-			
 		}
 
 		private void DrawBorder(Graphics graphics)
@@ -308,7 +314,6 @@ namespace CustomControlsImitatingUWP
 				g.DrawLine(crossPen, p3, p4);
 			}
 		}
-
 
 		public void SetPhotoVisible(bool visible)
 		{
@@ -386,18 +391,44 @@ namespace CustomControlsImitatingUWP
 			IsDeleted = !IsDeleted;
 			panel_Del.Visible = IsDeleted;
 		}
+
+		private void SvgCompositionView_DragEnter(object sender, DragEventArgs e)
+		{
+			SvgCompositionViewDragEnter?.Invoke(this, e);
+		}
+
+		private void SvgCompositionView_DragDrop(object sender, DragEventArgs e)
+		{
+			SvgCompositionViewDragDrop?.Invoke(this, e);
+		}
+
+		private void SvgCompositionView_DragOver(object sender, DragEventArgs e)
+		{
+			SvgCompositionViewDragOver?.Invoke(this,e);
+		}
+
+		private void SvgCompositionView_DragLeave(object sender, EventArgs e)
+		{
+			SvgCompositionViewDragLeave?.Invoke(this,e);
+		}
 	}
 
-	public class SvgCompositionViewDto 
+	public enum SvgCompositionViewInsertDirection
+	{
+		Null,
+		Left,
+		Right
+	}
+	public class SvgCompositionViewDto
 	{
 		public int Id { get; set; }
 		public string ContentImagePath { get; set; }
 
 		public string IconImagePath { get; set; }
 
-		public string Remark { get; set; } 
-		public string CreateTime { get; set; } 
-		
+		public string Remark { get; set; }
+		public string CreateTime { get; set; }
+
 		public string Orientation { get; set; }
 
 		public bool IsDeleted { get; set; } = false;
