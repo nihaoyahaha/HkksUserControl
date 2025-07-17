@@ -39,6 +39,7 @@
 			this.lb_numInfo = new System.Windows.Forms.Label();
 			this.pic_backward = new System.Windows.Forms.PictureBox();
 			this.pic_forward = new System.Windows.Forms.PictureBox();
+			this.lb_order = new System.Windows.Forms.Label();
 			this.panel_Top.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pic_triangle)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pic_tick)).BeginInit();
@@ -60,7 +61,7 @@
 			this.panel_Main.Location = new System.Drawing.Point(3, 32);
 			this.panel_Main.Name = "panel_Main";
 			this.panel_Main.Padding = new System.Windows.Forms.Padding(3);
-			this.panel_Main.Size = new System.Drawing.Size(382, 269);
+			this.panel_Main.Size = new System.Drawing.Size(417, 282);
 			this.panel_Main.TabIndex = 0;
 			this.panel_Main.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Main_Paint);
 			// 
@@ -143,12 +144,13 @@
 			// 
 			this.pic_backward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.pic_backward.Image = global::CustomControlsImitatingUWP.Properties.Resources.backward;
-			this.pic_backward.Location = new System.Drawing.Point(360, 9);
+			this.pic_backward.Location = new System.Drawing.Point(395, 9);
 			this.pic_backward.Name = "pic_backward";
 			this.pic_backward.Size = new System.Drawing.Size(16, 16);
 			this.pic_backward.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_backward.TabIndex = 13;
 			this.pic_backward.TabStop = false;
+			this.pic_backward.Visible = false;
 			this.pic_backward.Click += new System.EventHandler(this.pic_backward_Click);
 			// 
 			// pic_forward
@@ -156,19 +158,31 @@
 			this.pic_forward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.pic_forward.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.pic_forward.Image = global::CustomControlsImitatingUWP.Properties.Resources.forward;
-			this.pic_forward.Location = new System.Drawing.Point(336, 9);
+			this.pic_forward.Location = new System.Drawing.Point(371, 9);
 			this.pic_forward.Name = "pic_forward";
 			this.pic_forward.Size = new System.Drawing.Size(16, 16);
 			this.pic_forward.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_forward.TabIndex = 14;
 			this.pic_forward.TabStop = false;
+			this.pic_forward.Visible = false;
 			this.pic_forward.Click += new System.EventHandler(this.pic_forward_Click);
+			// 
+			// lb_order
+			// 
+			this.lb_order.AutoSize = true;
+			this.lb_order.Location = new System.Drawing.Point(268, 12);
+			this.lb_order.Name = "lb_order";
+			this.lb_order.Size = new System.Drawing.Size(53, 12);
+			this.lb_order.TabIndex = 15;
+			this.lb_order.Text = "並び順▲";
+			this.lb_order.Click += new System.EventHandler(this.lb_order_Click);
 			// 
 			// SvgGridView
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.Controls.Add(this.lb_order);
 			this.Controls.Add(this.pic_backward);
 			this.Controls.Add(this.pic_forward);
 			this.Controls.Add(this.lb_numInfo);
@@ -176,7 +190,7 @@
 			this.Controls.Add(this.panel_Top);
 			this.Controls.Add(this.panel_Main);
 			this.Name = "SvgGridView";
-			this.Size = new System.Drawing.Size(388, 304);
+			this.Size = new System.Drawing.Size(423, 317);
 			this.panel_Top.ResumeLayout(false);
 			this.panel_Top.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pic_triangle)).EndInit();
@@ -203,5 +217,6 @@
 		private System.Windows.Forms.Label lb_numInfo;
 		private System.Windows.Forms.PictureBox pic_backward;
 		private System.Windows.Forms.PictureBox pic_forward;
+		private System.Windows.Forms.Label lb_order;
 	}
 }

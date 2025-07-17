@@ -32,6 +32,11 @@ namespace CustomControlsImitatingUWP
 
 		private SvgCompositionViewInsertDirection _insertDirection = SvgCompositionViewInsertDirection.Null;
 
+		public List<SvgCompositionViewDto> DataSouce
+		{
+			get { return _dtos; }
+		}
+
 		public SvgGridView()
 		{
 			InitializeComponent();
@@ -307,7 +312,6 @@ namespace CustomControlsImitatingUWP
 		private void ClearDataSource()
 		{
 			if (_dataSouce == null) return;
-			_dtos = null;
 			for (int i = _dataSouce.Count-1; i >=0; i--)
 			{
 				var item = _dataSouce[i];
@@ -456,6 +460,7 @@ namespace CustomControlsImitatingUWP
 
 		public async Task BindAsync(params SvgCompositionViewDto[] dtos)
 		{
+			_dtos = null;
 			ClearDataSource();
 			int index = 0;
 			dtos.ToList().ForEach(x =>
@@ -465,6 +470,15 @@ namespace CustomControlsImitatingUWP
 			});
 			_dtos = dtos.ToList();
 			_currentdtos = _dtos.Select(d => (SvgCompositionViewDto)d.Clone()).ToList();
+			await InitDataSourceAsync(_dtos);
+		}
+
+		private async void lb_order_Click(object sender, EventArgs e)
+		{
+			lb_order.Text = lb_order.Text.Contains("▼") ? "並び順▲" : "並び順▼";
+			if (_dtos == null) return;
+			_dtos.Reverse();
+			ClearDataSource();
 			await InitDataSourceAsync(_dtos);
 		}
 

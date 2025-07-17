@@ -38,9 +38,10 @@ namespace WindowsFormsApp1
 			await svgGridView1.BindAsync(dtos.ToArray());
 		}
 
-		private async void button1_Click(object sender, EventArgs e)
+		private  void button1_Click(object sender, EventArgs e)
 		{
-			await InitDataAsync();
+			bool ischanged = svgGridView1.HasDataChanged();
+			MessageBox.Show(ischanged ? "发生修改" : "未发生修改");
 		}
 	}
 }

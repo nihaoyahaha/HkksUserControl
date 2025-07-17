@@ -277,26 +277,6 @@ namespace CustomControlsImitatingUWP
 
 		}
 
-		//当前页内数据前移
-		private void MoveSelectedItemsForward() => MoveSelectedItems(_selectedIndex - 1);
-
-		//跨页数据前移
-		private async Task MoveSelectedItemsAcrossPagesForwardAsync()
-		{
-			var dto = _dtos.FirstOrDefault(x => x.Id == _selectedItem.Id);
-			int dto_selectedIndex = _dtos.IndexOf(dto);
-
-			int dto_targetIndex = dto_selectedIndex - 1;
-
-			var dto_temp = _dtos[dto_selectedIndex];
-			_dtos[dto_selectedIndex] = _dtos[dto_targetIndex];
-			_dtos[dto_targetIndex] = dto_temp;
-
-			var data = _dataPager.PreviousPage();
-			await InitDataSourceAsync(data.ToArray());
-			SetSelectedIndex(_dataSouce.Count - 1);
-		}
-
 		//向后移动
 		private async void pic_backward_Click(object sender, EventArgs e)
 		{
@@ -313,6 +293,12 @@ namespace CustomControlsImitatingUWP
 				await MoveSelectedItemsAcrossPagesBackForwardAsync();
 			}
 		}
+
+		//当前页内数据前移
+		private void MoveSelectedItemsForward() => MoveSelectedItems(_selectedIndex - 1);
+
+		//当前页内数据后移
+		private void MoveSelectedItemsBackForward() => MoveSelectedItems(_selectedIndex + 1);
 
 		//当前页内数据移动
 		private void MoveSelectedItems(int targetIndex)
@@ -337,8 +323,22 @@ namespace CustomControlsImitatingUWP
 			SetSelectedIndex(targetIndex);
 		}
 
-		//当前页内数据后移
-		private void MoveSelectedItemsBackForward() => MoveSelectedItems(_selectedIndex + 1);
+		//跨页数据前移
+		private async Task MoveSelectedItemsAcrossPagesForwardAsync()
+		{
+			var dto = _dtos.FirstOrDefault(x => x.Id == _selectedItem.Id);
+			int dto_selectedIndex = _dtos.IndexOf(dto);
+
+			int dto_targetIndex = dto_selectedIndex - 1;
+
+			var dto_temp = _dtos[dto_selectedIndex];
+			_dtos[dto_selectedIndex] = _dtos[dto_targetIndex];
+			_dtos[dto_targetIndex] = dto_temp;
+
+			var data = _dataPager.PreviousPage();
+			await InitDataSourceAsync(data.ToArray());
+			SetSelectedIndex(_dataSouce.Count - 1);
+		}
 
 		//跨页数据后移
 		private async Task MoveSelectedItemsAcrossPagesBackForwardAsync()
@@ -356,6 +356,7 @@ namespace CustomControlsImitatingUWP
 			await InitDataSourceAsync(data.ToArray());
 		}
 
+		//拖拽完成后数据移动
 		private void MoveSelectedItem(int indexToMove, int targetIndex, bool insertAfter)
 		{
 			var item = _dataSouce[indexToMove];
@@ -555,6 +556,7 @@ namespace CustomControlsImitatingUWP
 			_selectedItem.Selected = true;
 			SetNumInfo();
 		}
+		
 		public void SetPhotoVisible(bool visible)
 		{
 			if (_selectedItem == null) return;
@@ -585,6 +587,14 @@ namespace CustomControlsImitatingUWP
 			_currentdtos = _dtos.Select(d => (SvgCompositionViewDto)d.Clone()).ToList();
 			_dataPager = new DataPager<SvgCompositionViewDto>(_dtos, _pageSize);
 			pic_PageHome_Click(null, null);
+		}
+
+		private async void lb_order_Click(object sender, EventArgs e)
+		{
+			lb_order.Text = lb_order.Text.Contains("▼") ? "並び順▲" : "並び順▼";
+			if (_dtos == null) return;
+			_dtos.Reverse();
+			await GoToAsync(_currentPage);
 		}
 	}
 }

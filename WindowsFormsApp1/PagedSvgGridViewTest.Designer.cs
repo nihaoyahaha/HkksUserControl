@@ -31,8 +31,8 @@
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
 			this.checkBox3 = new System.Windows.Forms.CheckBox();
-			this.svgGridView1 = new CustomControlsImitatingUWP.PagedSvgGridView();
 			this.button1 = new System.Windows.Forms.Button();
+			this.svgGridView1 = new CustomControlsImitatingUWP.PagedSvgGridView();
 			this.SuspendLayout();
 			// 
 			// checkBox1
@@ -71,17 +71,6 @@
 			this.checkBox3.UseVisualStyleBackColor = true;
 			this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
 			// 
-			// svgGridView1
-			// 
-			this.svgGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.svgGridView1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.svgGridView1.Location = new System.Drawing.Point(12, 12);
-			this.svgGridView1.Name = "svgGridView1";
-			this.svgGridView1.Size = new System.Drawing.Size(776, 493);
-			this.svgGridView1.TabIndex = 4;
-			// 
 			// button1
 			// 
 			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -92,6 +81,17 @@
 			this.button1.Text = "button1";
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
+			// svgGridView1
+			// 
+			this.svgGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.svgGridView1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.svgGridView1.Location = new System.Drawing.Point(12, 12);
+			this.svgGridView1.Name = "svgGridView1";
+			this.svgGridView1.Size = new System.Drawing.Size(776, 493);
+			this.svgGridView1.TabIndex = 4;
 			// 
 			// PagedSvgGridViewTest
 			// 

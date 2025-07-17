@@ -48,6 +48,7 @@
 			this.pic_backward = new System.Windows.Forms.PictureBox();
 			this.pic_forward = new System.Windows.Forms.PictureBox();
 			this.pic_remove = new System.Windows.Forms.PictureBox();
+			this.lb_order = new System.Windows.Forms.Label();
 			this.panel_Top.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pic_triangle)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pic_tick)).BeginInit();
@@ -168,7 +169,6 @@
 			this.txt_Goto.Name = "txt_Goto";
 			this.txt_Goto.Size = new System.Drawing.Size(33, 18);
 			this.txt_Goto.TabIndex = 9;
-			this.txt_Goto.Text = "1";
 			this.toolTip1.SetToolTip(this.txt_Goto, "指定されたページにジャンプ");
 			this.txt_Goto.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_Goto_KeyDown);
 			this.txt_Goto.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txt_Goto_KeyPress);
@@ -265,11 +265,22 @@
 			this.pic_remove.TabStop = false;
 			this.pic_remove.Click += new System.EventHandler(this.pic_remove_Click);
 			// 
+			// lb_order
+			// 
+			this.lb_order.AutoSize = true;
+			this.lb_order.Location = new System.Drawing.Point(265, 12);
+			this.lb_order.Name = "lb_order";
+			this.lb_order.Size = new System.Drawing.Size(53, 12);
+			this.lb_order.TabIndex = 16;
+			this.lb_order.Text = "並び順▲";
+			this.lb_order.Click += new System.EventHandler(this.lb_order_Click);
+			// 
 			// PagedSvgGridView
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.Controls.Add(this.lb_order);
 			this.Controls.Add(this.pic_backward);
 			this.Controls.Add(this.pic_forward);
 			this.Controls.Add(this.label1);
@@ -322,5 +333,6 @@
 		private System.Windows.Forms.ToolTip toolTip1;
 		private System.Windows.Forms.PictureBox pic_forward;
 		private System.Windows.Forms.PictureBox pic_backward;
+		private System.Windows.Forms.Label lb_order;
 	}
 }
