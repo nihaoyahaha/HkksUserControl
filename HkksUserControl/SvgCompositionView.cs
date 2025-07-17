@@ -366,13 +366,6 @@ namespace CustomControlsImitatingUWP
 			InitIcon(bitmap);
 		}
 
-		public void SetIcon(string iconPath)
-		{
-			if (string.IsNullOrEmpty(iconPath)) return;
-			if (!File.Exists(iconPath)) return;
-			InitIcon(new Bitmap(iconPath));
-		}
-
 		public void DisposeImage()
 		{
 			pic_svgImage.Image?.Dispose();
@@ -419,12 +412,21 @@ namespace CustomControlsImitatingUWP
 		Left,
 		Right
 	}
-	public class SvgCompositionViewDto
+
+	public enum CheckResultIcon
+	{ 
+	   CheckRsl_1,
+	   CheckRsl_2,
+	   CheckRsl_4,
+	   CheckRsl_5
+	}
+
+	public class SvgCompositionViewDto: ICloneable
 	{
-		public int Id { get; set; }
+		public int Id { get; set; } = -1;
 		public string ContentImagePath { get; set; }
 
-		public string IconImagePath { get; set; }
+		public CheckResultIcon CheckResult { get; set; }
 
 		public string Remark { get; set; }
 		public string CreateTime { get; set; }
@@ -433,7 +435,19 @@ namespace CustomControlsImitatingUWP
 
 		public bool IsDeleted { get; set; } = false;
 
-
+		public object Clone()
+		{
+			return new SvgCompositionViewDto
+			{
+				Id = this.Id,
+				ContentImagePath = ContentImagePath,
+				CheckResult= CheckResult,
+				Remark= Remark,
+				CreateTime= CreateTime,
+				Orientation= Orientation,
+				IsDeleted= IsDeleted
+			};
+		}
 	}
 }
 

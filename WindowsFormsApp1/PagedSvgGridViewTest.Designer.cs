@@ -32,6 +32,7 @@
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
 			this.checkBox3 = new System.Windows.Forms.CheckBox();
 			this.svgGridView1 = new CustomControlsImitatingUWP.PagedSvgGridView();
+			this.button1 = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// checkBox1
@@ -81,11 +82,23 @@
 			this.svgGridView1.Size = new System.Drawing.Size(776, 493);
 			this.svgGridView1.TabIndex = 4;
 			// 
+			// button1
+			// 
+			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.button1.Location = new System.Drawing.Point(567, 528);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(75, 23);
+			this.button1.TabIndex = 5;
+			this.button1.Text = "button1";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
 			// PagedSvgGridViewTest
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(800, 569);
+			this.Controls.Add(this.button1);
 			this.Controls.Add(this.svgGridView1);
 			this.Controls.Add(this.checkBox3);
 			this.Controls.Add(this.checkBox2);
@@ -107,5 +120,6 @@
 		private System.Windows.Forms.CheckBox checkBox2;
 		private System.Windows.Forms.CheckBox checkBox3;
 		private CustomControlsImitatingUWP.PagedSvgGridView svgGridView1;
+		private System.Windows.Forms.Button button1;
 	}
 }

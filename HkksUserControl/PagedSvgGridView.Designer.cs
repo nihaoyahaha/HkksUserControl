@@ -82,7 +82,7 @@
 			this.pic_triangle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_triangle.TabIndex = 0;
 			this.pic_triangle.TabStop = false;
-			this.pic_triangle.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_triangle.Click += new System.EventHandler(this.pic_triangle_Click);
 			// 
 			// pic_tick
 			// 
@@ -93,7 +93,7 @@
 			this.pic_tick.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_tick.TabIndex = 0;
 			this.pic_tick.TabStop = false;
-			this.pic_tick.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_tick.Click += new System.EventHandler(this.pic_tick_Click);
 			// 
 			// pic_crosses
 			// 
@@ -104,7 +104,7 @@
 			this.pic_crosses.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_crosses.TabIndex = 0;
 			this.pic_crosses.TabStop = false;
-			this.pic_crosses.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_crosses.Click += new System.EventHandler(this.pic_crosses_Click);
 			// 
 			// pic_rect
 			// 
@@ -115,7 +115,7 @@
 			this.pic_rect.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_rect.TabIndex = 0;
 			this.pic_rect.TabStop = false;
-			this.pic_rect.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_rect.Click += new System.EventHandler(this.pic_rect_Click);
 			// 
 			// lb_numInfo
 			// 
@@ -134,8 +134,10 @@
 			this.panel_Main.AutoScroll = true;
 			this.panel_Main.Location = new System.Drawing.Point(3, 38);
 			this.panel_Main.Name = "panel_Main";
+			this.panel_Main.Padding = new System.Windows.Forms.Padding(3);
 			this.panel_Main.Size = new System.Drawing.Size(496, 266);
 			this.panel_Main.TabIndex = 4;
+			this.panel_Main.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Main_Paint);
 			// 
 			// label1
 			// 
@@ -263,7 +265,7 @@
 			this.pic_remove.TabStop = false;
 			this.pic_remove.Click += new System.EventHandler(this.pic_remove_Click);
 			// 
-			// SvgGridView
+			// PagedSvgGridView
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -281,7 +283,7 @@
 			this.Controls.Add(this.lb_numInfo);
 			this.Controls.Add(this.pic_remove);
 			this.Controls.Add(this.panel_Top);
-			this.Name = "SvgGridView";
+			this.Name = "PagedSvgGridView";
 			this.Size = new System.Drawing.Size(502, 336);
 			this.panel_Top.ResumeLayout(false);
 			this.panel_Top.PerformLayout();

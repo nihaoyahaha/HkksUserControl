@@ -6,7 +6,13 @@ namespace CustomControlsImitatingUWP
 {
 	public class DataPager<T>
 	{
-		public IEnumerable<T> _dataSource;
+		private IEnumerable<T> _dataSource;
+
+		public IEnumerable<T> DataSource
+		{
+			set { _dataSource = value; }
+		}
+
 		private int _currentPage = 1;
 		public int CurrentPage
 		{

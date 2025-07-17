@@ -8,14 +8,43 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace CustomControlsImitatingUWP
 {
 	public partial class PagedSvgGridView : UserControl
 	{
+		private Color _insertCursorColor = Color.Coral;
+
+		private Rectangle _rectDragEnter = Rectangle.Empty;
+
+		private SvgCompositionViewInsertDirection _insertDirection = SvgCompositionViewInsertDirection.Null;
+
+		private bool _isDragOver = false;
+
 		private DataPager<SvgCompositionViewDto> _dataPager;
 
 		private int _pageSize = 9;
+
+		private int _selectedIndex = -1;
+
+		private SvgCompositionView _selectedItem;
+
+		private List<SvgCompositionView> _dataSouce = new List<SvgCompositionView>();
+
+		private int _currentPage
+		{
+			get { return _dataPager.CurrentPage; }
+		}
+
+		private int _totalPages
+		{
+			get { return _dataPager.TotalPages; }
+		}
+
+		private List<SvgCompositionViewDto> _dtos;
+
+		private List<SvgCompositionViewDto> _currentdtos;
 
 		[Description("每页显示的记录数，取值范围为9到18。")]
 		[Category("分页设置")]
@@ -29,28 +58,16 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
-		private int _selectedIndex = -1;
-
-		private SvgCompositionView _selectedItem;
-		
-		private List<SvgCompositionView> _dataSouce = new List<SvgCompositionView>();
-
-		private int _currentPage
-		{
-			get { return _dataPager.CurrentPage; }
-		}
-
-		private int _totalPages
-		{
-			get { return _dataPager.TotalPages; }
-		}
-
-		private SvgCompositionViewDto[] _dtos;  
-
 		public PagedSvgGridView()
 		{
 			InitializeComponent();
 			DoubleBuffered = true;
+			typeof(Panel).InvokeMember(
+			"DoubleBuffered",
+			System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+			null,
+			panel_Main,
+			new object[] { true });
 		}
 
 		private void SetNumInfo()
@@ -58,73 +75,31 @@ namespace CustomControlsImitatingUWP
 			lb_numInfo.Text = $"{_selectedIndex + 1}/{_dataSouce.Count}";
 		}
 
-		private void OnSelected(object sender, MouseEventArgs e)
-		{
-			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
-			if (obj != null) obj.Selected = false;
-			_selectedItem = (SvgCompositionView)sender;
-			_selectedItem.Selected = true;
-			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
-			SetNumInfo();
-		}
-
 		private void Add(SvgCompositionView item, bool isSetSelectedIndex = true)
 		{
 			if (item == null) return;
 			item.SelectionChanged += OnSelected;
+			item.SvgCompositionViewDragDrop += OnDragDrop;
+			item.SvgCompositionViewDragEnter += OnDragEnter;
+			item.SvgCompositionViewDragOver += OnDragOver;
+			item.SvgCompositionViewDragLeave += OnDragLeave;
 			_dataSouce.Add(item);
 			panel_Main.Controls.Add(item);
 			if (isSetSelectedIndex) SetSelectedIndex(_dataSouce.Count - 1);
 			SetNumInfo();
 		}
 
-		private void SetItemDeletedState(SvgCompositionView item) 
+		private void SetItemDeletedState(SvgCompositionView item)
 		{
 			if (item == null) return;
 			item.SetDeletedState();
-			_dtos.ToList().FirstOrDefault(x => x.Id == item.Id).IsDeleted = item.IsDeleted;
-		} 
-
-		private void CheckPicture_Click(object sender, EventArgs e)
-		{
-			if (_selectedItem == null) return;
-			var picturebox = sender as PictureBox;
-			_selectedItem.SetIcon((Bitmap)picturebox.Image.Clone());
-		}
-
-		public void SetSelectedIndex(int index)
-		{
-			if (index < 0) return;
-			if (index >= _dataSouce.Count) return;
-			_selectedIndex = index;
-			if (_selectedItem != null) _selectedItem.Selected = false;
-			_selectedItem = _dataSouce[index];
-			_selectedItem.Selected = true;
-			SetNumInfo();
+			_dtos.FirstOrDefault(x => x.Id == item.Id).IsDeleted = item.IsDeleted;
 		}
 
 		private void pic_remove_Click(object sender, EventArgs e)
 		{
 			if (_selectedItem == null) return;
 			SetItemDeletedState(_selectedItem);
-		}
-
-		public void SetPhotoVisible(bool visible)
-		{
-			if (_selectedItem == null) return;
-			_selectedItem.SetPhotoVisible(visible);
-		}
-
-		public void SetBlackboardVisible(bool visible)
-		{
-			if (_selectedItem == null) return;
-			_selectedItem.SetBlackboardVisible(visible);
-		}
-
-		public void SetNotesVisible(bool visible)
-		{
-			if (_selectedItem == null) return;
-			_selectedItem.SetNotesVisible(visible);
 		}
 
 		private async Task AddSvgCompositionViewAsync(SvgCompositionViewDto dto)
@@ -134,18 +109,6 @@ namespace CustomControlsImitatingUWP
 			Add(svgComposition, false);
 		}
 
-		public void Bind(params SvgCompositionViewDto[] dtos)
-		{
-			int index = 0;
-			dtos.ToList().ForEach(x => {
-				x.Id = index;
-				index++;
-			});
-			_dtos = dtos;
-			_dataPager = new DataPager<SvgCompositionViewDto>(dtos, _pageSize);
-			pic_PageHome_Click(null, null);
-		}
-
 		private void DisposeDataSourceItem()
 		{
 			if (_dataSouce != null)
@@ -153,6 +116,10 @@ namespace CustomControlsImitatingUWP
 				_dataSouce.ForEach(x =>
 				{
 					x.SelectionChanged -= OnSelected;
+					x.SvgCompositionViewDragDrop -= OnDragDrop;
+					x.SvgCompositionViewDragEnter -= OnDragEnter;
+					x.SvgCompositionViewDragOver -= OnDragOver;
+					x.SvgCompositionViewDragLeave -= OnDragLeave;
 					x.DisposeImage();
 					x.Dispose();
 				});
@@ -183,12 +150,29 @@ namespace CustomControlsImitatingUWP
 			SvgCompositionView svgComposition = new SvgCompositionView();
 			svgComposition.Id = dto.Id;
 			svgComposition.IsDeleted = dto.IsDeleted;
-			svgComposition.SetIcon(dto.IconImagePath);
+			svgComposition.SetIcon(GetCheckResultIcon(dto.CheckResult));
 			svgComposition.Remark = dto.Remark;
 			svgComposition.Date = dto.CreateTime;
 			svgComposition.Orientation = dto.Orientation;
 
 			return svgComposition;
+		}
+
+		private Bitmap GetCheckResultIcon(CheckResultIcon checkResult)
+		{
+			switch (checkResult)
+			{
+				case CheckResultIcon.CheckRsl_1:
+					return (Bitmap)pic_rect.Image.Clone();
+				case CheckResultIcon.CheckRsl_2:
+					return (Bitmap)pic_crosses.Image.Clone();
+				case CheckResultIcon.CheckRsl_4:
+					return (Bitmap)pic_tick.Image.Clone();
+				case CheckResultIcon.CheckRsl_5:
+					return (Bitmap)pic_triangle.Image.Clone();
+				default:
+					return (Bitmap)pic_rect.Image.Clone();
+			}
 		}
 
 		private void SetControlEnable(bool enable)
@@ -231,7 +215,7 @@ namespace CustomControlsImitatingUWP
 		{
 			if (_dataPager == null) return;
 			var data = _dataPager.NextPage();
-			 await InitDataSourceAsync(data.ToArray());
+			await InitDataSourceAsync(data.ToArray());
 		}
 
 		/// <summary>
@@ -241,21 +225,24 @@ namespace CustomControlsImitatingUWP
 		{
 			if (_dataPager == null) return;
 			var data = _dataPager.LastPage();
-			 await InitDataSourceAsync(data.ToArray());
+			await InitDataSourceAsync(data.ToArray());
 		}
 
+		/// <summary>
+		/// 目标页跳转
+		/// </summary>
 		private async Task GoToAsync(int page)
 		{
 			if (_dataPager == null) return;
 			var data = _dataPager.GoToPage(page);
-			 await InitDataSourceAsync(data.ToArray());
+			await InitDataSourceAsync(data.ToArray());
 			lb_PageInfo.Text = $"{_dataPager.CurrentPage}/{_dataPager.TotalPages}";
 		}
 
-		private  void txt_Goto_KeyPress(object sender, KeyPressEventArgs e)
+		private void txt_Goto_KeyPress(object sender, KeyPressEventArgs e)
 		{
 			if (char.IsDigit(e.KeyChar) || e.KeyChar == '\b') return;
-	
+
 			e.Handled = true;
 		}
 
@@ -286,7 +273,8 @@ namespace CustomControlsImitatingUWP
 			else
 			{
 				await MoveSelectedItemsAcrossPagesForwardAsync();
-			}		
+			}
+
 		}
 
 		//当前页内数据前移
@@ -295,10 +283,10 @@ namespace CustomControlsImitatingUWP
 		//跨页数据前移
 		private async Task MoveSelectedItemsAcrossPagesForwardAsync()
 		{
-			var dto = _dtos.FirstOrDefault(x => x.Id == _selectedItem.Id);			
-			int dto_selectedIndex = _dtos.ToList().IndexOf(dto);
+			var dto = _dtos.FirstOrDefault(x => x.Id == _selectedItem.Id);
+			int dto_selectedIndex = _dtos.IndexOf(dto);
 
-			int dto_targetIndex = dto_selectedIndex-1;
+			int dto_targetIndex = dto_selectedIndex - 1;
 
 			var dto_temp = _dtos[dto_selectedIndex];
 			_dtos[dto_selectedIndex] = _dtos[dto_targetIndex];
@@ -306,7 +294,7 @@ namespace CustomControlsImitatingUWP
 
 			var data = _dataPager.PreviousPage();
 			await InitDataSourceAsync(data.ToArray());
-			SetSelectedIndex(_dataSouce.Count-1);
+			SetSelectedIndex(_dataSouce.Count - 1);
 		}
 
 		//向后移动
@@ -315,7 +303,7 @@ namespace CustomControlsImitatingUWP
 			if (_dataPager == null) return;
 			if (_selectedItem == null) return;
 			if (_selectedIndex < 0) return;
-			if (_currentPage == _totalPages && _selectedIndex == _dataSouce.Count-1) return;
+			if (_currentPage == _totalPages && _selectedIndex == _dataSouce.Count - 1) return;
 			if (_selectedIndex < _dataSouce.Count - 1)
 			{
 				MoveSelectedItemsBackForward();
@@ -331,8 +319,8 @@ namespace CustomControlsImitatingUWP
 		{
 			var targetItem = _dataSouce[targetIndex];
 
-			int dto_selectedIndex = _dtos.ToList().IndexOf(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id));
-			int dto_targetIndex = _dtos.ToList().IndexOf(_dtos.FirstOrDefault(x => x.Id == targetItem.Id));
+			int dto_selectedIndex = _dtos.IndexOf(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id));
+			int dto_targetIndex = _dtos.IndexOf(_dtos.FirstOrDefault(x => x.Id == targetItem.Id));
 
 			panel_Main.Controls.SetChildIndex(_selectedItem, targetIndex);
 			panel_Main.Controls.SetChildIndex(targetItem, _selectedIndex);
@@ -351,12 +339,12 @@ namespace CustomControlsImitatingUWP
 
 		//当前页内数据后移
 		private void MoveSelectedItemsBackForward() => MoveSelectedItems(_selectedIndex + 1);
-		
+
 		//跨页数据后移
 		private async Task MoveSelectedItemsAcrossPagesBackForwardAsync()
 		{
 			var dto = _dtos.FirstOrDefault(x => x.Id == _selectedItem.Id);
-			int dto_selectedIndex = _dtos.ToList().IndexOf(dto);
+			int dto_selectedIndex = _dtos.IndexOf(dto);
 
 			int dto_targetIndex = dto_selectedIndex + 1;
 
@@ -366,6 +354,237 @@ namespace CustomControlsImitatingUWP
 
 			var data = _dataPager.NextPage();
 			await InitDataSourceAsync(data.ToArray());
+		}
+
+		private void MoveSelectedItem(int indexToMove, int targetIndex, bool insertAfter)
+		{
+			var item = _dataSouce[indexToMove];
+			var control = panel_Main.Controls[indexToMove];
+			var dtoItem = _dtos.FirstOrDefault(x => x.Id == item.Id);
+			var currentIndex = _dtos.IndexOf(dtoItem);
+
+			_dataSouce.RemoveAt(indexToMove);
+			panel_Main.Controls.RemoveAt(indexToMove);
+			_dtos.RemoveAt(currentIndex);
+
+			int insertPosition = targetIndex;
+			if (insertAfter)
+			{
+				if (indexToMove > targetIndex)
+				{
+					insertPosition++;
+				}
+			}
+			else
+			{
+				if (indexToMove < targetIndex)
+				{
+					insertPosition--;
+				}
+			}
+
+			_dataSouce.Insert(insertPosition, item);
+			panel_Main.Controls.Add(item);
+			panel_Main.Controls.SetChildIndex(control, insertPosition);
+
+			if (insertPosition < _dataSouce.Count - 2)
+			{
+				var nextItem = _dataSouce[insertPosition + 1];
+				int insertIndex = _dtos.IndexOf(_dtos.FirstOrDefault(x => x.Id == nextItem.Id));
+				_dtos.Insert(insertIndex, dtoItem);
+			}
+			else
+			{
+				var previousItem = _dataSouce[insertPosition - 1];
+				int insertIndex = _dtos.IndexOf(_dtos.FirstOrDefault(x => x.Id == previousItem.Id));
+				_dtos.Insert(insertIndex + 1, dtoItem);
+			}
+
+			SetSelectedIndex(insertPosition);
+		}
+
+		private void OnSelected(object sender, MouseEventArgs e)
+		{
+			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
+			if (obj != null) obj.Selected = false;
+			_selectedItem = (SvgCompositionView)sender;
+			_selectedItem.Selected = true;
+			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
+			SetNumInfo();
+
+			panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
+		}
+
+		private void OnDragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(typeof(SvgCompositionView)))
+			{
+				e.Effect = DragDropEffects.Move;
+			}
+		}
+
+		private void OnDragDrop(object sender, DragEventArgs e)
+		{
+			var targetItem = sender as SvgCompositionView;
+			int targetIndex = _dataSouce.IndexOf(targetItem);
+			if (targetIndex == _selectedIndex) return;
+
+			Point clientPoint = targetItem.PointToClient(new Point(e.X, e.Y));
+			bool isLeftSide = clientPoint.X < targetItem.Width / 2;
+			MoveSelectedItem(_selectedIndex, targetIndex, !isLeftSide);
+			_insertDirection = SvgCompositionViewInsertDirection.Null;
+			_rectDragEnter = Rectangle.Empty;
+			_isDragOver = false;
+			panel_Main.Invalidate();
+		}
+
+		private void OnDragOver(object sender, DragEventArgs e)
+		{
+			if (!e.Data.GetDataPresent(typeof(SvgCompositionView)))
+			{
+				return;
+			}
+			_isDragOver = true;
+			var targetItem = sender as SvgCompositionView;
+			if (targetItem.Id == _selectedItem.Id) return;
+
+			_insertDirection = SvgCompositionViewInsertDirection.Null;
+			_rectDragEnter = Rectangle.Empty;
+
+			Point clientPoint = targetItem.PointToClient(new Point(e.X, e.Y));
+			bool isLeftSide = clientPoint.X < targetItem.Width / 2;
+			_insertDirection = isLeftSide ? SvgCompositionViewInsertDirection.Left : SvgCompositionViewInsertDirection.Right;
+			_rectDragEnter = new Rectangle(targetItem.Location, targetItem.Size);
+			panel_Main.Invalidate();
+		}
+
+		private void OnDragLeave(object sender, EventArgs e)
+		{
+			_isDragOver = false;
+			panel_Main.Invalidate();
+		}
+
+		private void panel_Main_Paint(object sender, PaintEventArgs e)
+		{
+			if (_rectDragEnter != Rectangle.Empty)
+			{
+				DrawInsertCursor(e.Graphics);
+			}
+		}
+
+		private void DrawInsertCursor(Graphics g)
+		{
+			if (!_isDragOver) return;
+			using (Pen crossPen = new Pen(_insertCursorColor, 3))
+			{
+				Point p1 = Point.Empty;
+				Point p2 = Point.Empty;
+				if (_insertDirection == SvgCompositionViewInsertDirection.Left)
+				{
+					p1 = new Point(_rectDragEnter.X - 4, _rectDragEnter.Y);
+					p2 = new Point(_rectDragEnter.X - 4, _rectDragEnter.Y + _rectDragEnter.Height);
+				}
+				else
+				{
+					p1 = new Point(_rectDragEnter.X + _rectDragEnter.Width + 2, _rectDragEnter.Y);
+					p2 = new Point(_rectDragEnter.X + _rectDragEnter.Width + 2, _rectDragEnter.Y + _rectDragEnter.Height);
+				}
+
+				g.DrawLine(crossPen, p1, p2);
+			}
+		}
+
+		public bool HasDataChanged() 
+		{
+			if (_dtos.Count(x => x.IsDeleted) > 0) return true;
+			for (int i = 0; i < _dtos.Count; i++)
+			{
+				if (!DataCompare(_dtos[i], _currentdtos[i])) return true;
+			}
+			return false;
+		}
+
+		private bool DataCompare(SvgCompositionViewDto obj1,SvgCompositionViewDto obj2)
+		{
+			if (obj1.Id != obj2.Id) return false;
+			if (obj1.CheckResult != obj2.CheckResult) return false;
+			if (obj1.Remark != obj2.Remark) return false;
+			if (obj1.CreateTime != obj2.CreateTime) return false;
+			if (obj1.Orientation != obj2.Orientation) return false;
+			return true;
+		}
+
+		private void CheckPicture_Click(object sender)
+		{
+			if (_selectedItem == null) return;
+			var picturebox = sender as PictureBox;
+			_selectedItem.SetIcon((Bitmap)picturebox.Image.Clone());
+		}
+
+		private void pic_rect_Click(object sender, EventArgs e)
+		{
+			CheckPicture_Click(sender);
+			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_1;
+		}
+
+		private void pic_crosses_Click(object sender, EventArgs e)
+		{
+			CheckPicture_Click(sender);
+			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_2;
+		}
+
+		private void pic_tick_Click(object sender, EventArgs e)
+		{
+			CheckPicture_Click(sender);
+			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_4;
+		}
+
+		private void pic_triangle_Click(object sender, EventArgs e)
+		{
+			CheckPicture_Click(sender);
+			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_5;
+		}
+
+		public void SetSelectedIndex(int index)
+		{
+			if (index < 0) return;
+			if (index >= _dataSouce.Count) return;
+			_selectedIndex = index;
+			if (_selectedItem != null) _selectedItem.Selected = false;
+			_selectedItem = _dataSouce[index];
+			_selectedItem.Selected = true;
+			SetNumInfo();
+		}
+		public void SetPhotoVisible(bool visible)
+		{
+			if (_selectedItem == null) return;
+			_selectedItem.SetPhotoVisible(visible);
+		}
+
+		public void SetBlackboardVisible(bool visible)
+		{
+			if (_selectedItem == null) return;
+			_selectedItem.SetBlackboardVisible(visible);
+		}
+
+		public void SetNotesVisible(bool visible)
+		{
+			if (_selectedItem == null) return;
+			_selectedItem.SetNotesVisible(visible);
+		}
+
+		public void Bind(params SvgCompositionViewDto[] dtos)
+		{
+			int index = 0;
+			dtos.ToList().ForEach(x =>
+			{
+				x.Id = index;
+				index++;
+			});
+			_dtos = dtos.ToList();
+			_currentdtos = _dtos.Select(d => (SvgCompositionViewDto)d.Clone()).ToList();
+			_dataPager = new DataPager<SvgCompositionViewDto>(_dtos, _pageSize);
+			pic_PageHome_Click(null, null);
 		}
 	}
 }

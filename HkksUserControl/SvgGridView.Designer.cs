@@ -84,7 +84,7 @@
 			this.pic_triangle.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_triangle.TabIndex = 0;
 			this.pic_triangle.TabStop = false;
-			this.pic_triangle.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_triangle.Click += new System.EventHandler(this.pic_triangle_Click);
 			// 
 			// pic_tick
 			// 
@@ -95,7 +95,7 @@
 			this.pic_tick.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_tick.TabIndex = 0;
 			this.pic_tick.TabStop = false;
-			this.pic_tick.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_tick.Click += new System.EventHandler(this.pic_tick_Click);
 			// 
 			// pic_crosses
 			// 
@@ -106,7 +106,7 @@
 			this.pic_crosses.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_crosses.TabIndex = 0;
 			this.pic_crosses.TabStop = false;
-			this.pic_crosses.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_crosses.Click += new System.EventHandler(this.pic_crosses_Click);
 			// 
 			// pic_rect
 			// 
@@ -117,7 +117,7 @@
 			this.pic_rect.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
 			this.pic_rect.TabIndex = 0;
 			this.pic_rect.TabStop = false;
-			this.pic_rect.Click += new System.EventHandler(this.CheckPicture_Click);
+			this.pic_rect.Click += new System.EventHandler(this.pic_rect_Click);
 			// 
 			// pic_remove
 			// 
