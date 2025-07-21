@@ -27,21 +27,26 @@ namespace WindowsFormsApp1
 		public async Task InitDataAsync()
 		{
 			List<SvgCompositionViewDto> dtos = new List<SvgCompositionViewDto>();
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < 1; i++)
 			{
 				SvgCompositionViewDto dto = new SvgCompositionViewDto();
-				dto.ContentImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test.svg");
-				dto.CheckResult = CheckResultIcon.CheckRsl_1; 
+				dto.ContentImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.svg");
+				dto.CheckResult = CheckResultIcon.CheckRsl_1;
 				dto.Remark = $"{i + 1}";
 				dtos.Add(dto);
 			}
 			await svgGridView1.BindAsync(dtos.ToArray());
 		}
 
-		private  void button1_Click(object sender, EventArgs e)
+		private void button1_Click(object sender, EventArgs e)
 		{
 			bool ischanged = svgGridView1.HasDataChanged();
 			MessageBox.Show(ischanged ? "发生修改" : "未发生修改");
+		}
+
+		private void button1_Click_1(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

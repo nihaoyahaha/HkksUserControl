@@ -32,10 +32,10 @@ namespace CustomControlsImitatingUWP
 
 		private SvgCompositionViewInsertDirection _insertDirection = SvgCompositionViewInsertDirection.Null;
 
-		public List<SvgCompositionViewDto> DataSouce
-		{
-			get { return _dtos; }
-		}
+		//public List<SvgCompositionViewDto> DataSouce
+		//{
+		//	get { return _dtos; }
+		//}
 
 		public SvgGridView()
 		{
@@ -362,7 +362,7 @@ namespace CustomControlsImitatingUWP
 			panel_Main.Controls.SetChildIndex(control, insertPosition);
 
 
-			if (insertPosition < _dataSouce.Count - 2)
+			if (insertPosition <= _dataSouce.Count - 2)
 			{
 				var nextItem = _dataSouce[insertPosition + 1];
 				int insertIndex = _dtos.IndexOf(_dtos.FirstOrDefault(x => x.Id == nextItem.Id));
@@ -378,34 +378,35 @@ namespace CustomControlsImitatingUWP
 			SetSelectedIndex(insertPosition);
 		}
 
-		private void CheckPicture_Click(object sender)
+		private bool CheckPicture_Click(object sender)
 		{
-			if (_selectedItem == null) return;
+			if (_selectedItem == null) return false;
 			var picturebox = sender as PictureBox;
 			_selectedItem.SetIcon((Bitmap)picturebox.Image.Clone());
+			return true;
 		}
 
 		private void pic_rect_Click(object sender, EventArgs e)
 		{
-			CheckPicture_Click(sender);
+			if(! CheckPicture_Click(sender))return;
 			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_1;
 		}
 
 		private void pic_crosses_Click(object sender, EventArgs e)
 		{
-			CheckPicture_Click(sender);
+			if (!CheckPicture_Click(sender)) return;
 			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_2;
 		}
 
 		private void pic_tick_Click(object sender, EventArgs e)
 		{
-			CheckPicture_Click(sender);
+			if (!CheckPicture_Click(sender)) return;
 			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_4;
 		}
 
 		private void pic_triangle_Click(object sender, EventArgs e)
 		{
-			CheckPicture_Click(sender);
+			if (!CheckPicture_Click(sender)) return;
 			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_5;
 		}
 
@@ -475,6 +476,7 @@ namespace CustomControlsImitatingUWP
 
 		private async void lb_order_Click(object sender, EventArgs e)
 		{
+			if (_dataSouce.Count==0) return;
 			lb_order.Text = lb_order.Text.Contains("▼") ? "並び順▲" : "並び順▼";
 			if (_dtos == null) return;
 			_dtos.Reverse();
