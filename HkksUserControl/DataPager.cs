@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CustomControlsImitatingUWP
+namespace HkksUserControl
 {
 	public class DataPager<T>
 	{

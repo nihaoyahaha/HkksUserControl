@@ -1,4 +1,4 @@
-﻿using CustomControlsImitatingUWP;
+﻿using HkksUserControl;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,12 +22,16 @@ namespace WindowsFormsApp1
 		private async void SvgGridViewTest_Load(object sender, EventArgs e)
 		{
 			await InitDataAsync();
+			svgGridView1.ClickItem += (a, b) => {
+				var item = a as SvgCompositionView;
+				//MessageBox.Show(item.Remark);
+			};
 		}
 
 		public async Task InitDataAsync()
 		{
 			List<SvgCompositionViewDto> dtos = new List<SvgCompositionViewDto>();
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				SvgCompositionViewDto dto = new SvgCompositionViewDto();
 				dto.ContentImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.svg");
@@ -38,13 +42,22 @@ namespace WindowsFormsApp1
 			await svgGridView1.BindAsync(dtos.ToArray());
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+
+		private async void button1_Click_1(object sender, EventArgs e)
 		{
-			bool ischanged = svgGridView1.HasDataChanged();
+			SvgCompositionViewDto dto = new SvgCompositionViewDto();
+			dto.Remark = "66";
+			svgGridView1.UpdateItem(dto);
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+
+			bool ischanged = svgGridView1.IsDataChanged();
 			MessageBox.Show(ischanged ? "发生修改" : "未发生修改");
 		}
 
-		private void button1_Click_1(object sender, EventArgs e)
+		private void svgGridView1_Load(object sender, EventArgs e)
 		{
 
 		}

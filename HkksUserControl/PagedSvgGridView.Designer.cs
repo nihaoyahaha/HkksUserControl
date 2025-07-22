@@ -1,4 +1,4 @@
-﻿namespace CustomControlsImitatingUWP
+﻿namespace HkksUserControl
 {
 	partial class PagedSvgGridView
 	{

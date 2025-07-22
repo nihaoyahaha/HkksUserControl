@@ -29,7 +29,8 @@
 		private void InitializeComponent()
 		{
 			this.button1 = new System.Windows.Forms.Button();
-			this.svgGridView1 = new CustomControlsImitatingUWP.SvgGridView();
+			this.button2 = new System.Windows.Forms.Button();
+			this.svgGridView1 = new HkksUserControl.SvgGridView();
 			this.SuspendLayout();
 			// 
 			// button1
@@ -43,6 +44,16 @@
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.button1_Click_1);
 			// 
+			// button2
+			// 
+			this.button2.Location = new System.Drawing.Point(826, 93);
+			this.button2.Name = "button2";
+			this.button2.Size = new System.Drawing.Size(75, 23);
+			this.button2.TabIndex = 3;
+			this.button2.Text = "button2";
+			this.button2.UseVisualStyleBackColor = true;
+			this.button2.Click += new System.EventHandler(this.button2_Click);
+			// 
 			// svgGridView1
 			// 
 			this.svgGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -53,12 +64,14 @@
 			this.svgGridView1.Name = "svgGridView1";
 			this.svgGridView1.Size = new System.Drawing.Size(743, 525);
 			this.svgGridView1.TabIndex = 2;
+			this.svgGridView1.Load += new System.EventHandler(this.svgGridView1_Load);
 			// 
 			// SvgGridViewTest
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(913, 584);
+			this.Controls.Add(this.button2);
 			this.Controls.Add(this.svgGridView1);
 			this.Controls.Add(this.button1);
 			this.Name = "SvgGridViewTest";
@@ -70,6 +83,7 @@
 
 		#endregion
 		private System.Windows.Forms.Button button1;
-		private CustomControlsImitatingUWP.SvgGridView svgGridView1;
+		private HkksUserControl.SvgGridView svgGridView1;
+		private System.Windows.Forms.Button button2;
 	}
 }

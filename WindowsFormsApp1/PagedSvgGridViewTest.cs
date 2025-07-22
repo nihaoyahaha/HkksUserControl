@@ -1,4 +1,4 @@
-﻿using CustomControlsImitatingUWP;
+﻿using HkksUserControl;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,11 +38,6 @@ namespace WindowsFormsApp1
 			svgGridView1.Bind(dtos.ToArray());
 		}
 
-		private void checkBox1_CheckedChanged(object sender, EventArgs e)
-		{
-			svgGridView1.SetPhotoVisible(checkBox1.Checked);
-		}
-
 		private void checkBox2_CheckedChanged(object sender, EventArgs e)
 		{
 			svgGridView1.SetBlackboardVisible(checkBox2.Checked);
@@ -55,8 +50,6 @@ namespace WindowsFormsApp1
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			bool ischanged = svgGridView1.HasDataChanged();
-			MessageBox.Show(ischanged ? "发生修改":"未发生修改");
 		}
 	}
 }

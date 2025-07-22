@@ -11,68 +11,87 @@ using Svg;
 using System.IO;
 using System.Web;
 using System.Diagnostics;
+using CustomControlsImitatingUWP.Properties;
 
-namespace CustomControlsImitatingUWP
+namespace HkksUserControl
 {
 	public partial class SvgCompositionView : UserControl
 	{
-		private const string _photoID = "photo";
 		private const string _blackboardID = "blackboard";
 		private const string _notesID = "notes";
 		private bool _isHovered = false;
 		private Color _borderColor;
 		private SvgDocument _svgDoc;
 
+		//图片类型
 		private ImageType _imageType = ImageType.Svg;
 		public ImageType ImageType
 		{
 			get { return _imageType; }
 		}
 
+		//内容图片路径
 		private string _contentImagePath;
 		public string GetContentImagePath
 		{
 			get { return _contentImagePath; }
 		}
 
-		public Bitmap Icon
+		//检查结果图标
+		private CheckResultIcon _resultIcon = CheckResultIcon.Null;
+		public CheckResultIcon ResultIcon
 		{
-			get { return (Bitmap)pic_Icon.Image.Clone(); }
+			get { return _resultIcon; }
+			private set
+			{
+				_resultIcon = value;
+				switch (value)
+				{
+					case CheckResultIcon.CheckRsl_1: pic_Icon.Image = Resources.checkRsl_1; break;
+					case CheckResultIcon.CheckRsl_2: pic_Icon.Image = Resources.checkRsl_2; break;
+					case CheckResultIcon.CheckRsl_4: pic_Icon.Image = Resources.checkRsl_4; break;
+					case CheckResultIcon.CheckRsl_5: pic_Icon.Image = Resources.checkRsl_5; break;
+				}
+			}
 		}
 
+		//创建时间
 		public string _date;
 		public string Date
 		{
 			get { return _date; }
-			set
+			private set
 			{
 				_date = value;
 				lb_Date.Text = value;
 			}
 		}
 
-		public string _orientation;
+		//摄影方向
+		private string _orientation = "";
 		public string Orientation
 		{
 			get { return _orientation; }
-			set
+			private set
 			{
 				_orientation = value;
 				lb_Orientation.Text = value;
 			}
 		}
 
-		public string _remark;
+		//备注
+		private string _remark = "";
 		public string Remark
 		{
 			get { return _remark; }
-			set
+			private set
 			{
 				_remark = value;
 				lb_remark.Text = value;
 			}
 		}
 
+		//选中状态
 		private bool _isSelected = false;
 		public bool Selected
 		{
@@ -85,18 +104,39 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
-		private bool _isDeleted = false;
-		public bool IsDeleted
+	   //数据变更状态
+		private ChangeType _changeType= ChangeType.None;
+		public ChangeType ChangeType
 		{
-			get { return _isDeleted; }
-			set
+			get { return _changeType; }
+			private set
 			{
-				_isDeleted = value;
-				panel_Del.Visible = value;
+				_changeType = value;
+				panel_Del.Visible = value == ChangeType.Deleted ? true : false;
 			}
 		}
 
-		public int Id { get; set; }
+		//svg 图层的显示状态
+		private SvgLayerDisplay _layerDisplay = SvgLayerDisplay.ShowAll;
+
+		/// <summary>
+		///    写真      黑板      注释
+		/// 7:  ⭕        ⭕        ⭕
+		/// 3:  ⭕        ⭕        ✖
+		/// 5:  ⭕        ✖        ⭕
+		/// 1:  ⭕        ✖        ✖
+		/// </summary>
+		public SvgLayerDisplay LayerDisplay
+		{
+			get { return _layerDisplay; }
+		    private set
+			{
+				_layerDisplay = value;
+			}
+		}
+
+		//控件索引
+		public int Id { get;private set; }
 
 		public event EventHandler<MouseEventArgs> SelectionChanged;
 		public event EventHandler<DragEventArgs> SvgCompositionViewDragDrop;
@@ -113,54 +153,7 @@ namespace CustomControlsImitatingUWP
 			panel_Del.Location = new Point(1, 1);
 		}
 
-		private void InitContentImage(string filePath)
-		{
-			_contentImagePath = filePath;
-			pic_svgImage.Image?.Dispose();
-			pic_svgImage.Image = null;
-			if (string.IsNullOrEmpty(_contentImagePath)) return;
-			if (!File.Exists(_contentImagePath)) return;
-			_imageType = _contentImagePath.EndsWith(".svg") ? ImageType.Svg : ImageType.Jpg;
-			if (_imageType == ImageType.Svg)
-			{
-				lb_greenbk.Visible = true;
-				lb_inkCanvas.Visible = true;
-				_svgDoc = null;
-				_svgDoc = SvgDocument.Open(_contentImagePath);
-				pic_svgImage.Image = _svgDoc.Draw();
-				_svgDoc.Children.ToList().ForEach(x =>
-				{
-					if (x is SvgImage)
-					{
-						if (x.ID == _photoID)
-						{
-							lb_photo.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-						}
-						if (x.ID == _blackboardID)
-						{
-							lb_greenbk.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-						}
-						if (x.ID == _notesID)
-						{
-							lb_inkCanvas.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-						}
-					}
-
-					if (x is SvgPath)
-					{
-						lb_inkCanvas.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-					}
-				});
-			}
-			else
-			{
-				pic_svgImage.Image = new Bitmap(_contentImagePath);
-				lb_photo.BackColor = Color.FromArgb(255, 192, 192);
-				lb_greenbk.Visible = false;
-				lb_inkCanvas.Visible = false;
-			}
-		}
-
+		//初始化内容图片
 		private async Task InitContentImageAsync(string filePath)
 		{
 			_contentImagePath = filePath;
@@ -171,56 +164,60 @@ namespace CustomControlsImitatingUWP
 			_imageType = _contentImagePath.EndsWith(".svg") ? ImageType.Svg : ImageType.Jpg;
 			if (_imageType == ImageType.Svg)
 			{
-				lb_greenbk.Visible = true;
-				lb_inkCanvas.Visible = true;
 				_svgDoc = null;
-				await Task.Run(() =>
+				pic_svgImage.Image = await Task.Run(() =>
 				{
 					_svgDoc = SvgDocument.Open(_contentImagePath);
-					pic_svgImage.Image = _svgDoc.Draw();
-					_svgDoc.Children.ToList().ForEach(x =>
-					{
-						if (x is SvgImage)
-						{
-							if (x.ID == _photoID)
-							{
-								lb_photo.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-							}
-							if (x.ID == _blackboardID)
-							{
-								lb_greenbk.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-							}
-							if (x.ID == _notesID)
-							{
-								lb_inkCanvas.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-							}
-						}
-
-						if (x is SvgPath)
-						{
-							lb_inkCanvas.BackColor = x.Display == "inline" ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-						}
-					});
+					return _svgDoc.Draw();
 				});
-
 			}
 			else
 			{
 				pic_svgImage.Image = new Bitmap(_contentImagePath);
+			}
+			SetLabelBackColor();
+		}
+
+		//根据显示svg图层显示状态设置控件背景颜色
+		private void SetLabelBackColor()
+		{
+			if (_imageType == ImageType.Svg)
+			{
+				lb_greenbk.Visible = true;
+				lb_inkCanvas.Visible = true;
+				switch (_layerDisplay)
+				{
+					case  SvgLayerDisplay.OnlyNotesHide:
+						lb_photo.BackColor = Color.FromArgb(255, 192, 192);
+						lb_greenbk.BackColor = Color.FromArgb(255, 192, 192);
+						lb_inkCanvas.BackColor = SystemColors.ControlLight;
+						break;
+					case SvgLayerDisplay.OnlyGreenBoardHide:
+						lb_photo.BackColor = Color.FromArgb(255, 192, 192);
+						lb_greenbk.BackColor = SystemColors.ControlLight;
+						lb_inkCanvas.BackColor = Color.FromArgb(255, 192, 192);
+						break;
+					case SvgLayerDisplay.GreenBoardAndNotesHide:
+						lb_photo.BackColor = Color.FromArgb(255, 192, 192);
+						lb_greenbk.BackColor = SystemColors.ControlLight;
+						lb_inkCanvas.BackColor = SystemColors.ControlLight;
+						break;
+					default:
+						lb_photo.BackColor = Color.FromArgb(255, 192, 192);
+						lb_greenbk.BackColor = Color.FromArgb(255, 192, 192);
+						lb_inkCanvas.BackColor = Color.FromArgb(255, 192, 192);
+						break;
+				}
+			}
+			else
+			{
 				lb_photo.BackColor = Color.FromArgb(255, 192, 192);
 				lb_greenbk.Visible = false;
 				lb_inkCanvas.Visible = false;
 			}
 		}
 
-		private void InitIcon(Bitmap bitmap)
-		{
-			if (bitmap == null) return;
-			pic_Icon.Image?.Dispose();
-			pic_Icon.Image = null;
-			pic_Icon.Image = bitmap;
-		}
-
+		//注册事件
 		private void InitializeHoverEffect()
 		{
 			MouseEnter += OnControlMouseEnter;
@@ -282,6 +279,7 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
+		//绘制选中样式
 		private void DrawBorder(Graphics graphics)
 		{
 			using (Pen pen = new Pen(_borderColor, 2))
@@ -294,6 +292,7 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
+		//绘制删除样式(仅PagedSvgGridView 可用)
 		private void DrawDeleteOverlay(Graphics g)
 		{
 			// 创建灰色半透明遮罩
@@ -315,18 +314,7 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
-		public void SetPhotoVisible(bool visible)
-		{
-			if (_imageType == ImageType.Jpg) return;
-			if (_svgDoc == null) return;
-			var item = _svgDoc.Children.FirstOrDefault(x => x is SvgImage && x.ID == _photoID);
-			if (item == null) return;
-			item.Display = visible ? "inline" : "none";
-			lb_photo.BackColor = visible ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
-			_svgDoc.Write(_contentImagePath);
-			pic_svgImage.Image = _svgDoc.Draw();
-		}
-
+		//设置svg绿板图层的显示隐藏
 		public void SetBlackboardVisible(bool visible)
 		{
 			if (_imageType == ImageType.Jpg) return;
@@ -337,8 +325,10 @@ namespace CustomControlsImitatingUWP
 			lb_greenbk.BackColor = visible ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
 			_svgDoc.Write(_contentImagePath);
 			pic_svgImage.Image = _svgDoc.Draw();
+			SetSvgLayerDisplay();
 		}
 
+		//设置svg注释图层的显示隐藏
 		public void SetNotesVisible(bool visible)
 		{
 			if (_imageType == ImageType.Jpg) return;
@@ -349,31 +339,34 @@ namespace CustomControlsImitatingUWP
 			lb_inkCanvas.BackColor = visible ? Color.FromArgb(255, 192, 192) : SystemColors.ControlLight;
 			_svgDoc.Write(_contentImagePath);
 			pic_svgImage.Image = _svgDoc.Draw();
+			SetSvgLayerDisplay();
 		}
 
-		public void SetContentImage(string path)
+		//设置svg图层显示状态
+		private void SetSvgLayerDisplay()
 		{
-			InitContentImage(path);
+			if (lb_photo.Visible && lb_greenbk.Visible && lb_inkCanvas.Visible)
+			{
+				_layerDisplay = SvgLayerDisplay.ShowAll;
+			}
+			else if (lb_photo.Visible && lb_greenbk.Visible && !lb_inkCanvas.Visible)
+			{
+				_layerDisplay = SvgLayerDisplay.OnlyNotesHide;
+			}
+			else if (lb_photo.Visible && !lb_greenbk.Visible && lb_inkCanvas.Visible)
+			{
+				_layerDisplay = SvgLayerDisplay.OnlyGreenBoardHide;
+			}
+			else if (lb_photo.Visible && !lb_greenbk.Visible && !lb_inkCanvas.Visible)
+			{
+				_layerDisplay = SvgLayerDisplay.GreenBoardAndNotesHide;
+			}
 		}
+		
+		//设置内容图片
+		public async Task SetContentImageAsync(string path) => await InitContentImageAsync(path);
 
-		public async Task SetContentImageAsync(string path)
-		{
-			await InitContentImageAsync(path);
-		}
-
-		public void SetIcon(Bitmap bitmap)
-		{
-			InitIcon(bitmap);
-		}
-
-		public void DisposeImage()
-		{
-			pic_svgImage.Image?.Dispose();
-			pic_svgImage.Image = null;
-			pic_Icon.Image?.Dispose();
-			pic_Icon.Image = null;
-		}
-
+		//绘制删除时的状态(仅PagedSvgGridView可用)
 		private void panel_Del_Paint(object sender, PaintEventArgs e)
 		{
 			DrawDeleteOverlay(e.Graphics);
@@ -381,8 +374,8 @@ namespace CustomControlsImitatingUWP
 
 		public void SetDeletedState()
 		{
-			IsDeleted = !IsDeleted;
-			panel_Del.Visible = IsDeleted;
+			_changeType = _changeType == ChangeType.Deleted ? ChangeType.None : ChangeType.Deleted;
+			panel_Del.Visible = _changeType == ChangeType.Deleted ? true : false;
 		}
 
 		private void SvgCompositionView_DragEnter(object sender, DragEventArgs e)
@@ -397,57 +390,41 @@ namespace CustomControlsImitatingUWP
 
 		private void SvgCompositionView_DragOver(object sender, DragEventArgs e)
 		{
-			SvgCompositionViewDragOver?.Invoke(this,e);
+			SvgCompositionViewDragOver?.Invoke(this, e);
 		}
 
 		private void SvgCompositionView_DragLeave(object sender, EventArgs e)
 		{
-			SvgCompositionViewDragLeave?.Invoke(this,e);
+			SvgCompositionViewDragLeave?.Invoke(this, e);
 		}
-	}
 
-	public enum SvgCompositionViewInsertDirection
-	{
-		Null,
-		Left,
-		Right
-	}
-
-	public enum CheckResultIcon
-	{ 
-	   CheckRsl_1,
-	   CheckRsl_2,
-	   CheckRsl_4,
-	   CheckRsl_5
-	}
-
-	public class SvgCompositionViewDto: ICloneable
-	{
-		public int Id { get; set; } = -1;
-		public string ContentImagePath { get; set; }
-
-		public CheckResultIcon CheckResult { get; set; }
-
-		public string Remark { get; set; }
-		public string CreateTime { get; set; }
-
-		public string Orientation { get; set; }
-
-		public bool IsDeleted { get; set; } = false;
-
-		public object Clone()
+		public async Task RefreshContentImageAsync()
 		{
-			return new SvgCompositionViewDto
-			{
-				Id = this.Id,
-				ContentImagePath = ContentImagePath,
-				CheckResult= CheckResult,
-				Remark= Remark,
-				CreateTime= CreateTime,
-				Orientation= Orientation,
-				IsDeleted= IsDeleted
-			};
+			await InitContentImageAsync(_contentImagePath);
 		}
+
+		public static SvgCompositionView Create(SvgCompositionViewDto dto)
+		{
+			SvgCompositionView svgComposition = new SvgCompositionView();
+			svgComposition.Id = dto.Id;
+			svgComposition.ResultIcon = dto.CheckResult;
+			svgComposition.Remark = dto.Remark;
+			svgComposition.Date = dto.CreateTime;
+			svgComposition.Orientation = dto.Orientation;
+			return svgComposition;
+		}
+
+		public void Update(SvgCompositionViewDto dto)
+		{
+			ResultIcon = dto.CheckResult;
+			Remark = dto.Remark;
+			Date = dto.CreateTime;
+			Orientation = dto.Orientation;
+		}
+
+		//设置检查结果图标
+		public void SetResultIcon(CheckResultIcon resultIcon) => ResultIcon = resultIcon;
+
 	}
 }
 

@@ -10,32 +10,51 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Diagnostics;
 
-namespace CustomControlsImitatingUWP
+namespace HkksUserControl
 {
 	public partial class SvgGridView : UserControl
 	{
+		//插入光标颜色
 		private Color _insertCursorColor = Color.Coral;
-		
+
+		//元素控件数据
 		private List<SvgCompositionViewDto> _dtos;
-		
+
+		//元素控件原始数据
 		private List<SvgCompositionViewDto> _currentdtos;
 
 		private int _selectedIndex = -1;
 
+		//用于判断是否绘制插入光标
 		private bool _isDragOver = false;
 
+		//当前选中的元素
 		private SvgCompositionView _selectedItem;
 
+		//元素控件
 		private List<SvgCompositionView> _dataSouce = new List<SvgCompositionView>();
 
+		//目标元素尺寸
 		private Rectangle _rectDragEnter = Rectangle.Empty;
 
+		//拖拽时在目标元素上的位置
 		private SvgCompositionViewInsertDirection _insertDirection = SvgCompositionViewInsertDirection.Null;
 
-		//public List<SvgCompositionViewDto> DataSouce
-		//{
-		//	get { return _dtos; }
-		//}
+		//元素点击事件
+		public event EventHandler<EventArgs> ClickItem;
+
+		public SvgCompositionView SelectedItem
+		{
+			get { return _selectedItem; }
+		}
+
+		public List<SvgCompositionViewDto> DataSouce
+		{
+			get 
+			{
+				return _dtos; 
+			}
+		}
 
 		public SvgGridView()
 		{
@@ -58,9 +77,10 @@ namespace CustomControlsImitatingUWP
 		{
 			if (item == null) return;
 			item.SetDeletedState();
-			_dtos.FirstOrDefault(x => x.Id == item.Id).IsDeleted = item.IsDeleted;
+			_dtos.FirstOrDefault(x => x.Id == item.Id).ChangeType = item.ChangeType;
 		}
 
+		//释放元素控件
 		private void Remove(SvgCompositionView item)
 		{
 			if (item == null) return;
@@ -74,9 +94,7 @@ namespace CustomControlsImitatingUWP
 				item.SvgCompositionViewDragEnter -= OnDragEnter;
 				item.SvgCompositionViewDragOver -= OnDragOver;
 				item.SvgCompositionViewDragLeave -= OnDragLeave;
-				item.DisposeImage();
 				item.Dispose();
-				item = null;
 				_selectedItem = null;
 				GC.Collect();
 				if (_dataSouce.Count > 0)
@@ -95,12 +113,14 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 	
+		//删除元素控件
 		private void pic_remove_Click(object sender, EventArgs e)
 		{
 			if (_selectedItem == null) return;
 			Remove(_selectedItem);
 		}
 
+		//添加元素控件
 		private async Task InitDataSourceAsync(List<SvgCompositionViewDto> dtos)
 		{
 			SetControlEnable(false);
@@ -116,39 +136,9 @@ namespace CustomControlsImitatingUWP
 
 		private async Task AddSvgCompositionViewAsync(SvgCompositionViewDto dto)
 		{
-			SvgCompositionView svgComposition = SetSvgCompositionViewProperties(dto);
+			SvgCompositionView svgComposition = SvgCompositionView.Create(dto);
 			await svgComposition.SetContentImageAsync(dto.ContentImagePath);
 			AddItem(svgComposition);
-		}
-
-		private SvgCompositionView SetSvgCompositionViewProperties(SvgCompositionViewDto dto)
-		{
-			SvgCompositionView svgComposition = new SvgCompositionView();
-			svgComposition.Id = dto.Id == -1 ? _dtos.Max(x => x.Id) + 1 : dto.Id;
-			svgComposition.IsDeleted = dto.IsDeleted;
-			svgComposition.SetIcon(GetCheckResultIcon(dto.CheckResult));
-			svgComposition.Remark = dto.Remark;
-			svgComposition.Date = dto.CreateTime;
-			svgComposition.Orientation = dto.Orientation;
-
-			return svgComposition;
-		}
-
-		private Bitmap GetCheckResultIcon(CheckResultIcon checkResult)
-		{
-			switch (checkResult)
-			{	
-				case CheckResultIcon.CheckRsl_1:
-					return (Bitmap)pic_rect.Image.Clone();
-				case CheckResultIcon.CheckRsl_2:
-					return (Bitmap)pic_crosses.Image.Clone();
-				case CheckResultIcon.CheckRsl_4:
-					return (Bitmap)pic_tick.Image.Clone();
-				case CheckResultIcon.CheckRsl_5:
-					return (Bitmap)pic_triangle.Image.Clone();
-				default:
-					return (Bitmap)pic_rect.Image.Clone();
-			}
 		}
 
 		private void AddItem(SvgCompositionView item)
@@ -164,6 +154,7 @@ namespace CustomControlsImitatingUWP
 			SetNumInfo();
 		}
 
+		//设置按钮启用状态
 		private void SetControlEnable(bool enable)
 		{
 			pic_rect.Enabled = enable;
@@ -174,11 +165,21 @@ namespace CustomControlsImitatingUWP
 			panel_Main.Enabled = enable;
 		}
 
+		//元素前移
 		private void pic_forward_Click(object sender, EventArgs e)
 		{
 			if (_selectedItem == null) return;
 			if (_selectedIndex <= 0) return;
 			MoveSelectedItemsForward();
+		}
+
+		//元素后移
+		private void pic_backward_Click(object sender, EventArgs e)
+		{
+			if (_selectedItem == null) return;
+			if (_selectedIndex < 0) return;
+			if (_selectedIndex == _dataSouce.Count - 1) return;
+			MoveSelectedItemsBackForward();
 		}
 
 		//当前页内数据前移
@@ -207,17 +208,10 @@ namespace CustomControlsImitatingUWP
 			SetSelectedIndex(targetIndex);
 		}
 
-		private void pic_backward_Click(object sender, EventArgs e)
-		{
-			if (_selectedItem == null) return;
-			if (_selectedIndex < 0) return;
-			if (_selectedIndex == _dataSouce.Count - 1) return;
-			MoveSelectedItemsBackForward();
-		}
-
 		//当前页内数据后移
 		private void MoveSelectedItemsBackForward() => MoveSelectedItems(_selectedIndex + 1);
 
+		//绘制插入光标
 		private void panel_Main_Paint(object sender, PaintEventArgs e)
 		{
 			if (_rectDragEnter != Rectangle.Empty)
@@ -248,8 +242,10 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
+		//元素选中事件
 		private void OnSelected(object sender, MouseEventArgs e)
 		{
+			ClickItem?.Invoke(sender,e);
 			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
 			if (obj != null) obj.Selected = false;
 			_selectedItem = sender as SvgCompositionView;
@@ -258,8 +254,10 @@ namespace CustomControlsImitatingUWP
 			SetNumInfo();
 
 			panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
+			panel_Main.ScrollControlIntoView(_selectedItem);
 		}
 
+		//拖动进入元素时触发
 		private void OnDragEnter(object sender, DragEventArgs e)
 		{
 			if (e.Data.GetDataPresent(typeof(SvgCompositionView)))
@@ -268,6 +266,7 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
+		//拖动释放鼠标键时触发
 		private void OnDragDrop(object sender, DragEventArgs e)
 		{
 			var targetItem = sender as SvgCompositionView;
@@ -283,6 +282,7 @@ namespace CustomControlsImitatingUWP
 			panel_Main.Invalidate();
 		}
 
+		//拖动在元素内部移动时持续触发
 		private void OnDragOver(object sender, DragEventArgs e)
 		{
 			if (!e.Data.GetDataPresent(typeof(SvgCompositionView))) 
@@ -303,12 +303,14 @@ namespace CustomControlsImitatingUWP
 			panel_Main.Invalidate();
 		}
 
+		//拖动离开元素时触发
 		private void OnDragLeave(object sender, EventArgs e)
 		{
 			_isDragOver = false;
 			panel_Main.Invalidate();
 		}
 
+		//清除元素控件
 		private void ClearDataSource()
 		{
 			if (_dataSouce == null) return;
@@ -322,7 +324,6 @@ namespace CustomControlsImitatingUWP
 				item.SvgCompositionViewDragEnter -= OnDragEnter;
 				item.SvgCompositionViewDragOver -= OnDragOver;
 				item.SvgCompositionViewDragLeave -= OnDragLeave;
-				item.DisposeImage();
 				item.Dispose();
 				item = null;
 			}
@@ -331,6 +332,7 @@ namespace CustomControlsImitatingUWP
 			GC.Collect();
 		}
 
+		//拖拽元素完成后修改数据位置
 		private void MoveSelectedItem(int indexToMove, int targetIndex, bool insertAfter)
 		{
 			var item = _dataSouce[indexToMove];
@@ -378,58 +380,50 @@ namespace CustomControlsImitatingUWP
 			SetSelectedIndex(insertPosition);
 		}
 
-		private bool CheckPicture_Click(object sender)
+		//设置检查结果
+		private void SetResultIcon(CheckResultIcon resultIcon)
 		{
-			if (_selectedItem == null) return false;
-			var picturebox = sender as PictureBox;
-			_selectedItem.SetIcon((Bitmap)picturebox.Image.Clone());
-			return true;
+			if (_selectedItem == null) return;
+			_selectedItem.SetResultIcon(resultIcon);
+			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = resultIcon;
 		}
 
-		private void pic_rect_Click(object sender, EventArgs e)
+		private void pic_rect_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_1);
+		
+		private void pic_crosses_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_2);
+		
+		private void pic_tick_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_4);
+		
+		private void pic_triangle_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_5);
+		
+	   //检查数据是否被排序过
+		public bool IsOrderChanged()
 		{
-			if(! CheckPicture_Click(sender))return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_1;
-		}
-
-		private void pic_crosses_Click(object sender, EventArgs e)
-		{
-			if (!CheckPicture_Click(sender)) return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_2;
-		}
-
-		private void pic_tick_Click(object sender, EventArgs e)
-		{
-			if (!CheckPicture_Click(sender)) return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_4;
-		}
-
-		private void pic_triangle_Click(object sender, EventArgs e)
-		{
-			if (!CheckPicture_Click(sender)) return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_5;
-		}
-
-		private bool DataCompare(SvgCompositionViewDto obj1, SvgCompositionViewDto obj2)
-		{
-			if (obj1.Id != obj2.Id) return false;
-			if (obj1.CheckResult != obj2.CheckResult) return false;
-			if (obj1.Remark != obj2.Remark) return false;
-			if (obj1.CreateTime != obj2.CreateTime) return false;
-			if (obj1.Orientation != obj2.Orientation) return false;
-			return true;
-		}
-
-		public bool HasDataChanged()
-		{
-			if (_dtos.Count(x => x.IsDeleted) > 0) return true;
+			bool isChanged = false;
 			for (int i = 0; i < _dtos.Count; i++)
 			{
-				if (!DataCompare(_dtos[i], _currentdtos[i])) return true;
+				if (_dtos[i].Id != _currentdtos[i].Id) isChanged = true;
 			}
+			return isChanged;
+		}
+
+		private void DataCompare(SvgCompositionViewDto obj1, SvgCompositionViewDto obj2)
+		{
+			if (obj1.LayerDisplay != obj2.LayerDisplay) { obj1.ChangeType = ChangeType.Modified; }
+			if (obj1.CheckResult != obj2.CheckResult) { obj1.ChangeType = ChangeType.Modified; }
+			if (obj1.Remark != obj2.Remark) { obj1.ChangeType = ChangeType.Modified; }
+			if (obj1.Orientation != obj2.Orientation) { obj1.ChangeType = ChangeType.Modified; }
+		}
+
+		//判断数据是否被修改
+		public bool IsDataChanged()
+		{
+			if (_dtos.Count(x => x.ChangeType  != ChangeType.None) > 0) return true;
+			if (IsOrderChanged()) return true;
 			return false;
 		}
 
+		//设置当前选中的元素
 		public void SetSelectedIndex(int index)
 		{
 			if (index < 0) return;
@@ -441,24 +435,21 @@ namespace CustomControlsImitatingUWP
 			SetNumInfo();
 		}
 
-		public void SetPhotoVisible(bool visible)
-		{
-			if (_selectedItem == null) return;
-			_selectedItem.SetPhotoVisible(visible);
-		}
-
+		//设置绿板层显示状态
 		public void SetBlackboardVisible(bool visible)
 		{
 			if (_selectedItem == null) return;
 			_selectedItem.SetBlackboardVisible(visible);
 		}
 
+		//设置画图层显示状态
 		public void SetNotesVisible(bool visible)
 		{
 			if (_selectedItem == null) return;
 			_selectedItem.SetNotesVisible(visible);
 		}
 
+		//绑定数据
 		public async Task BindAsync(params SvgCompositionViewDto[] dtos)
 		{
 			_dtos = null;
@@ -474,6 +465,7 @@ namespace CustomControlsImitatingUWP
 			await InitDataSourceAsync(_dtos);
 		}
 
+		//升序/降序排序
 		private async void lb_order_Click(object sender, EventArgs e)
 		{
 			if (_dataSouce.Count==0) return;
@@ -482,6 +474,14 @@ namespace CustomControlsImitatingUWP
 			_dtos.Reverse();
 			ClearDataSource();
 			await InitDataSourceAsync(_dtos);
+		}
+
+		//修改元素数据
+		public void UpdateItem(SvgCompositionViewDto dto)
+		{
+			if (_selectedItem == null) return;
+			_selectedItem.Update(dto);
+			DataCompare(_dtos.FirstOrDefault(x=>x.Id == _selectedItem.Id),dto);
 		}
 
 	}

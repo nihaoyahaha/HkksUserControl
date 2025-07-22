@@ -32,7 +32,7 @@
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
 			this.checkBox3 = new System.Windows.Forms.CheckBox();
 			this.button1 = new System.Windows.Forms.Button();
-			this.svgGridView1 = new CustomControlsImitatingUWP.PagedSvgGridView();
+			this.svgGridView1 = new HkksUserControl.PagedSvgGridView();
 			this.SuspendLayout();
 			// 
 			// checkBox1
@@ -45,7 +45,6 @@
 			this.checkBox1.TabIndex = 3;
 			this.checkBox1.Text = "写真";
 			this.checkBox1.UseVisualStyleBackColor = true;
-			this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
 			// 
 			// checkBox2
 			// 
@@ -119,7 +118,7 @@
 		private System.Windows.Forms.CheckBox checkBox1;
 		private System.Windows.Forms.CheckBox checkBox2;
 		private System.Windows.Forms.CheckBox checkBox3;
-		private CustomControlsImitatingUWP.PagedSvgGridView svgGridView1;
+		private HkksUserControl.PagedSvgGridView svgGridView1;
 		private System.Windows.Forms.Button button1;
 	}
 }

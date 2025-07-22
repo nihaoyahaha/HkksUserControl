@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Linq.Expressions;
 
-namespace CustomControlsImitatingUWP
+namespace HkksUserControl
 {
 	public partial class PagedSvgGridView : UserControl
 	{
@@ -58,6 +58,8 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
+		public event EventHandler<EventArgs> ClickItem;
+
 		public PagedSvgGridView()
 		{
 			InitializeComponent();
@@ -93,7 +95,7 @@ namespace CustomControlsImitatingUWP
 		{
 			if (item == null) return;
 			item.SetDeletedState();
-			_dtos.FirstOrDefault(x => x.Id == item.Id).IsDeleted = item.IsDeleted;
+			_dtos.FirstOrDefault(x => x.Id == item.Id).ChangeType = item.ChangeType;
 		}
 
 		private void pic_remove_Click(object sender, EventArgs e)
@@ -104,7 +106,7 @@ namespace CustomControlsImitatingUWP
 
 		private async Task AddSvgCompositionViewAsync(SvgCompositionViewDto dto)
 		{
-			SvgCompositionView svgComposition = SetSvgCompositionViewProperties(dto);
+			SvgCompositionView svgComposition = SvgCompositionView.Create(dto);
 			await svgComposition.SetContentImageAsync(dto.ContentImagePath);
 			Add(svgComposition, false);
 		}
@@ -120,7 +122,6 @@ namespace CustomControlsImitatingUWP
 					x.SvgCompositionViewDragEnter -= OnDragEnter;
 					x.SvgCompositionViewDragOver -= OnDragOver;
 					x.SvgCompositionViewDragLeave -= OnDragLeave;
-					x.DisposeImage();
 					x.Dispose();
 				});
 			}
@@ -143,36 +144,6 @@ namespace CustomControlsImitatingUWP
 			SetControlEnable(true);
 			Cursor = Cursors.Default;
 			SetSelectedIndex(0);
-		}
-
-		private SvgCompositionView SetSvgCompositionViewProperties(SvgCompositionViewDto dto)
-		{
-			SvgCompositionView svgComposition = new SvgCompositionView();
-			svgComposition.Id = dto.Id;
-			svgComposition.IsDeleted = dto.IsDeleted;
-			svgComposition.SetIcon(GetCheckResultIcon(dto.CheckResult));
-			svgComposition.Remark = dto.Remark;
-			svgComposition.Date = dto.CreateTime;
-			svgComposition.Orientation = dto.Orientation;
-
-			return svgComposition;
-		}
-
-		private Bitmap GetCheckResultIcon(CheckResultIcon checkResult)
-		{
-			switch (checkResult)
-			{
-				case CheckResultIcon.CheckRsl_1:
-					return (Bitmap)pic_rect.Image.Clone();
-				case CheckResultIcon.CheckRsl_2:
-					return (Bitmap)pic_crosses.Image.Clone();
-				case CheckResultIcon.CheckRsl_4:
-					return (Bitmap)pic_tick.Image.Clone();
-				case CheckResultIcon.CheckRsl_5:
-					return (Bitmap)pic_triangle.Image.Clone();
-				default:
-					return (Bitmap)pic_rect.Image.Clone();
-			}
 		}
 
 		private void SetControlEnable(bool enable)
@@ -410,9 +381,11 @@ namespace CustomControlsImitatingUWP
 			if (obj != null) obj.Selected = false;
 			_selectedItem = (SvgCompositionView)sender;
 			_selectedItem.Selected = true;
+
+			if(_dtos.FirstOrDefault(x=>x.Id == _selectedItem.Id).ChangeType != ChangeType.Deleted) ClickItem?.Invoke(sender, e);
+
 			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
 			SetNumInfo();
-
 			panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
 		}
 
@@ -485,7 +458,7 @@ namespace CustomControlsImitatingUWP
 					p1 = new Point(_rectDragEnter.X - 4, _rectDragEnter.Y);
 					p2 = new Point(_rectDragEnter.X - 4, _rectDragEnter.Y + _rectDragEnter.Height);
 				}
-				else
+				else if(_insertDirection == SvgCompositionViewInsertDirection.Right)
 				{
 					p1 = new Point(_rectDragEnter.X + _rectDragEnter.Width + 2, _rectDragEnter.Y);
 					p2 = new Point(_rectDragEnter.X + _rectDragEnter.Width + 2, _rectDragEnter.Y + _rectDragEnter.Height);
@@ -495,56 +468,48 @@ namespace CustomControlsImitatingUWP
 			}
 		}
 
-		public bool HasDataChanged() 
+		public bool IsDataChanged()
 		{
-			if (_dtos.Count(x => x.IsDeleted) > 0) return true;
-			for (int i = 0; i < _dtos.Count; i++)
-			{
-				if (!DataCompare(_dtos[i], _currentdtos[i])) return true;
-			}
+			if (_dtos.Count(x => x.ChangeType != ChangeType.None) > 0) return true;
+			if (IsOrderChanged()) return true;
 			return false;
 		}
 
-		private bool DataCompare(SvgCompositionViewDto obj1,SvgCompositionViewDto obj2)
+		public bool IsOrderChanged()
 		{
-			if (obj1.Id != obj2.Id) return false;
-			if (obj1.CheckResult != obj2.CheckResult) return false;
-			if (obj1.Remark != obj2.Remark) return false;
-			if (obj1.CreateTime != obj2.CreateTime) return false;
-			if (obj1.Orientation != obj2.Orientation) return false;
-			return true;
+			bool isChanged = false;
+			for (int i = 0; i < _dtos.Count; i++)
+			{
+				if (_dtos[i].Id != _currentdtos[i].Id) isChanged = true;
+			}
+			return isChanged;
 		}
 
-		private bool CheckPicture_Click(object sender)
+		private void SetResultIcon(CheckResultIcon checkResult)
 		{
-			if (_selectedItem == null) return false;
-			var picturebox = sender as PictureBox;
-			_selectedItem.SetIcon((Bitmap)picturebox.Image.Clone());
-			return true;
+			if (_selectedItem == null) return;
+			_selectedItem.SetResultIcon(checkResult);
+			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = checkResult;
 		}
 
 		private void pic_rect_Click(object sender, EventArgs e)
 		{
-			if (!CheckPicture_Click(sender)) return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_1;
+			SetResultIcon(CheckResultIcon.CheckRsl_1);
 		}
 
 		private void pic_crosses_Click(object sender, EventArgs e)
 		{
-			if (!CheckPicture_Click(sender)) return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_2;
+			SetResultIcon(CheckResultIcon.CheckRsl_2);
 		}
 
 		private void pic_tick_Click(object sender, EventArgs e)
 		{
-			if (!CheckPicture_Click(sender)) return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_4;
+			SetResultIcon(CheckResultIcon.CheckRsl_4);
 		}
 
 		private void pic_triangle_Click(object sender, EventArgs e)
 		{
-			if (!CheckPicture_Click(sender)) return;
-			_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id).CheckResult = CheckResultIcon.CheckRsl_5;
+			SetResultIcon(CheckResultIcon.CheckRsl_5);
 		}
 
 		public void SetSelectedIndex(int index)
@@ -558,12 +523,6 @@ namespace CustomControlsImitatingUWP
 			SetNumInfo();
 		}
 		
-		public void SetPhotoVisible(bool visible)
-		{
-			if (_selectedItem == null) return;
-			_selectedItem.SetPhotoVisible(visible);
-		}
-
 		public void SetBlackboardVisible(bool visible)
 		{
 			if (_selectedItem == null) return;
@@ -596,6 +555,20 @@ namespace CustomControlsImitatingUWP
 			if (_dtos == null) return;
 			_dtos.Reverse();
 			await GoToAsync(_currentPage);
+		}
+
+		public void UpdateItem(SvgCompositionViewDto dto)
+		{
+			if (_selectedItem == null) return;
+			_selectedItem.Update(dto);
+			DataCompare(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id), dto);
+		}
+		private void DataCompare(SvgCompositionViewDto obj1, SvgCompositionViewDto obj2)
+		{
+			if (obj1.LayerDisplay != obj2.LayerDisplay) { obj1.ChangeType = ChangeType.Modified; }
+			if (obj1.CheckResult != obj2.CheckResult) { obj1.ChangeType = ChangeType.Modified; }
+			if (obj1.Remark != obj2.Remark) { obj1.ChangeType = ChangeType.Modified; }
+			if (obj1.Orientation != obj2.Orientation) { obj1.ChangeType = ChangeType.Modified; }
 		}
 	}
 }

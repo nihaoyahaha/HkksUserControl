@@ -1,4 +1,4 @@
-﻿namespace CustomControlsImitatingUWP
+﻿namespace HkksUserControl
 {
 	partial class SvgGridView
 	{
@@ -57,7 +57,6 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.panel_Main.AutoScroll = true;
-			this.panel_Main.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panel_Main.Location = new System.Drawing.Point(3, 32);
 			this.panel_Main.Name = "panel_Main";
 			this.panel_Main.Padding = new System.Windows.Forms.Padding(3);
