@@ -104,18 +104,6 @@ namespace HkksUserControl
 			}
 		}
 
-	   //数据变更状态
-		private ChangeType _changeType= ChangeType.None;
-		public ChangeType ChangeType
-		{
-			get { return _changeType; }
-			private set
-			{
-				_changeType = value;
-				panel_Del.Visible = value == ChangeType.Deleted ? true : false;
-			}
-		}
-
 		//svg 图层的显示状态
 		private SvgLayerDisplay _layerDisplay = SvgLayerDisplay.ShowAll;
 
@@ -129,14 +117,14 @@ namespace HkksUserControl
 		public SvgLayerDisplay LayerDisplay
 		{
 			get { return _layerDisplay; }
-		    private set
+			private set
 			{
 				_layerDisplay = value;
 			}
 		}
 
 		//控件索引
-		public int Id { get;private set; }
+		public int Id { get; private set; }
 
 		public event EventHandler<MouseEventArgs> SelectionChanged;
 		public event EventHandler<DragEventArgs> SvgCompositionViewDragDrop;
@@ -152,6 +140,8 @@ namespace HkksUserControl
 			panel_Del.Size = new Size(Width - 4, Height - 4);
 			panel_Del.Location = new Point(1, 1);
 		}
+
+		public SvgCompositionView(SvgCompositionViewDto dto) : this() => Create(dto);
 
 		//初始化内容图片
 		private async Task InitContentImageAsync(string filePath)
@@ -187,7 +177,7 @@ namespace HkksUserControl
 				lb_inkCanvas.Visible = true;
 				switch (_layerDisplay)
 				{
-					case  SvgLayerDisplay.OnlyNotesHide:
+					case SvgLayerDisplay.OnlyNotesHide:
 						lb_photo.BackColor = Color.FromArgb(255, 192, 192);
 						lb_greenbk.BackColor = Color.FromArgb(255, 192, 192);
 						lb_inkCanvas.BackColor = SystemColors.ControlLight;
@@ -361,49 +351,34 @@ namespace HkksUserControl
 			{
 				_layerDisplay = SvgLayerDisplay.GreenBoardAndNotesHide;
 			}
+		}		
+
+		public ChangeType SetDeletedState()
+		{
+			panel_Del.Visible = !panel_Del.Visible;
+			return panel_Del.Visible ? ChangeType.Deleted : ChangeType.None;
 		}
-		
+
 		//设置内容图片
 		public async Task SetContentImageAsync(string path) => await InitContentImageAsync(path);
 
 		//绘制删除时的状态(仅PagedSvgGridView可用)
-		private void panel_Del_Paint(object sender, PaintEventArgs e)
-		{
-			DrawDeleteOverlay(e.Graphics);
-		}
+		private void panel_Del_Paint(object sender, PaintEventArgs e) => DrawDeleteOverlay(e.Graphics);
 
-		public void SetDeletedState()
-		{
-			_changeType = _changeType == ChangeType.Deleted ? ChangeType.None : ChangeType.Deleted;
-			panel_Del.Visible = _changeType == ChangeType.Deleted ? true : false;
-		}
+		private void SvgCompositionView_DragEnter(object sender, DragEventArgs e) => SvgCompositionViewDragEnter?.Invoke(this, e);
 
-		private void SvgCompositionView_DragEnter(object sender, DragEventArgs e)
-		{
-			SvgCompositionViewDragEnter?.Invoke(this, e);
-		}
+		private void SvgCompositionView_DragDrop(object sender, DragEventArgs e) => SvgCompositionViewDragDrop?.Invoke(this, e);
 
-		private void SvgCompositionView_DragDrop(object sender, DragEventArgs e)
-		{
-			SvgCompositionViewDragDrop?.Invoke(this, e);
-		}
+		private void SvgCompositionView_DragOver(object sender, DragEventArgs e) => SvgCompositionViewDragOver?.Invoke(this, e);
 
-		private void SvgCompositionView_DragOver(object sender, DragEventArgs e)
-		{
-			SvgCompositionViewDragOver?.Invoke(this, e);
-		}
+		private void SvgCompositionView_DragLeave(object sender, EventArgs e) => SvgCompositionViewDragLeave?.Invoke(this, e);
 
-		private void SvgCompositionView_DragLeave(object sender, EventArgs e)
-		{
-			SvgCompositionViewDragLeave?.Invoke(this, e);
-		}
+		public async Task RefreshContentImageAsync() => await InitContentImageAsync(_contentImagePath);
 
-		public async Task RefreshContentImageAsync()
-		{
-			await InitContentImageAsync(_contentImagePath);
-		}
+		//设置检查结果图标
+		public void SetResultIcon(CheckResultIcon resultIcon) => ResultIcon = resultIcon;
 
-		public static SvgCompositionView Create(SvgCompositionViewDto dto)
+		public SvgCompositionView Create(SvgCompositionViewDto dto)
 		{
 			SvgCompositionView svgComposition = new SvgCompositionView();
 			svgComposition.Id = dto.Id;
@@ -411,6 +386,8 @@ namespace HkksUserControl
 			svgComposition.Remark = dto.Remark;
 			svgComposition.Date = dto.CreateTime;
 			svgComposition.Orientation = dto.Orientation;
+			svgComposition.LayerDisplay = dto.LayerDisplay;
+			if (dto.ChangeType == ChangeType.Deleted) panel_Del.Visible = false;
 			return svgComposition;
 		}
 
@@ -418,13 +395,9 @@ namespace HkksUserControl
 		{
 			ResultIcon = dto.CheckResult;
 			Remark = dto.Remark;
-			Date = dto.CreateTime;
 			Orientation = dto.Orientation;
+			LayerDisplay = dto.LayerDisplay;
 		}
-
-		//设置检查结果图标
-		public void SetResultIcon(CheckResultIcon resultIcon) => ResultIcon = resultIcon;
-
 	}
 }
 

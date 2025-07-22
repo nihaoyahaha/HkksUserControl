@@ -43,26 +43,26 @@ namespace HkksUserControl
 		//元素点击事件
 		public event EventHandler<EventArgs> ClickItem;
 
+		//选中的元素
 		public SvgCompositionView SelectedItem
 		{
 			get { return _selectedItem; }
 		}
 
+		//元素数据
 		public List<SvgCompositionViewDto> DataSouce
 		{
-			get 
-			{
-				return _dtos; 
-			}
+			get { return _dtos;	}
 		}
 
 		public SvgGridView()
 		{
 			InitializeComponent();
 			DoubleBuffered = true;
+			//FlowLayoutPanel开启双缓冲，避免闪烁
 			typeof(Panel).InvokeMember(
 			"DoubleBuffered",
-			System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+			BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
 			null,
 			panel_Main,
 			new object[] { true });
@@ -73,11 +73,11 @@ namespace HkksUserControl
 			lb_numInfo.Text = $"{_selectedIndex + 1}/{_dataSouce.Count}";
 		}
 
+		//将元素数据状态设置为删除状态
 		private void SetItemDeletedState(SvgCompositionView item)
 		{
 			if (item == null) return;
-			item.SetDeletedState();
-			_dtos.FirstOrDefault(x => x.Id == item.Id).ChangeType = item.ChangeType;
+			_dtos.FirstOrDefault(x => x.Id == item.Id).ChangeType = ChangeType.Deleted;
 		}
 
 		//释放元素控件
@@ -96,7 +96,6 @@ namespace HkksUserControl
 				item.SvgCompositionViewDragLeave -= OnDragLeave;
 				item.Dispose();
 				_selectedItem = null;
-				GC.Collect();
 				if (_dataSouce.Count > 0)
 				{
 					var index = _selectedIndex == _dataSouce.Count ? (_dataSouce.Count > 1 ? _selectedIndex - 1 : 0) : _selectedIndex;
@@ -112,7 +111,7 @@ namespace HkksUserControl
 				}
 			}
 		}
-	
+
 		//删除元素控件
 		private void pic_remove_Click(object sender, EventArgs e)
 		{
@@ -120,7 +119,7 @@ namespace HkksUserControl
 			Remove(_selectedItem);
 		}
 
-		//添加元素控件
+		//初始化panel内的元素
 		private async Task InitDataSourceAsync(List<SvgCompositionViewDto> dtos)
 		{
 			SetControlEnable(false);
@@ -134,23 +133,19 @@ namespace HkksUserControl
 			SetSelectedIndex(0);
 		}
 
+		//panel内添加元素
 		private async Task AddSvgCompositionViewAsync(SvgCompositionViewDto dto)
 		{
-			SvgCompositionView svgComposition = SvgCompositionView.Create(dto);
+			if (dto == null) return;
+			SvgCompositionView svgComposition = new SvgCompositionView(dto);
 			await svgComposition.SetContentImageAsync(dto.ContentImagePath);
-			AddItem(svgComposition);
-		}
-
-		private void AddItem(SvgCompositionView item)
-		{
-			if (item == null) return;
-			item.SelectionChanged += OnSelected;
-			item.SvgCompositionViewDragDrop += OnDragDrop;
-			item.SvgCompositionViewDragEnter += OnDragEnter;
-			item.SvgCompositionViewDragOver += OnDragOver;
-			item.SvgCompositionViewDragLeave += OnDragLeave;
-			_dataSouce.Add(item);
-			panel_Main.Controls.Add(item);
+			svgComposition.SelectionChanged += OnSelected;
+			svgComposition.SvgCompositionViewDragDrop += OnDragDrop;
+			svgComposition.SvgCompositionViewDragEnter += OnDragEnter;
+			svgComposition.SvgCompositionViewDragOver += OnDragOver;
+			svgComposition.SvgCompositionViewDragLeave += OnDragLeave;
+			_dataSouce.Add(svgComposition);
+			panel_Main.Controls.Add(svgComposition);
 			SetNumInfo();
 		}
 
@@ -245,7 +240,7 @@ namespace HkksUserControl
 		//元素选中事件
 		private void OnSelected(object sender, MouseEventArgs e)
 		{
-			ClickItem?.Invoke(sender,e);
+			ClickItem?.Invoke(sender, e);
 			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
 			if (obj != null) obj.Selected = false;
 			_selectedItem = sender as SvgCompositionView;
@@ -285,9 +280,9 @@ namespace HkksUserControl
 		//拖动在元素内部移动时持续触发
 		private void OnDragOver(object sender, DragEventArgs e)
 		{
-			if (!e.Data.GetDataPresent(typeof(SvgCompositionView))) 
-			{ 
-				return; 
+			if (!e.Data.GetDataPresent(typeof(SvgCompositionView)))
+			{
+				return;
 			}
 			_isDragOver = true;
 			var targetItem = sender as SvgCompositionView;
@@ -295,7 +290,7 @@ namespace HkksUserControl
 
 			_insertDirection = SvgCompositionViewInsertDirection.Null;
 			_rectDragEnter = Rectangle.Empty;
-			
+
 			Point clientPoint = targetItem.PointToClient(new Point(e.X, e.Y));
 			bool isLeftSide = clientPoint.X < targetItem.Width / 2;
 			_insertDirection = isLeftSide ? SvgCompositionViewInsertDirection.Left : SvgCompositionViewInsertDirection.Right;
@@ -314,7 +309,7 @@ namespace HkksUserControl
 		private void ClearDataSource()
 		{
 			if (_dataSouce == null) return;
-			for (int i = _dataSouce.Count-1; i >=0; i--)
+			for (int i = _dataSouce.Count - 1; i >= 0; i--)
 			{
 				var item = _dataSouce[i];
 				_dataSouce.Remove(item);
@@ -389,14 +384,14 @@ namespace HkksUserControl
 		}
 
 		private void pic_rect_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_1);
-		
+
 		private void pic_crosses_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_2);
-		
+
 		private void pic_tick_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_4);
-		
+
 		private void pic_triangle_Click(object sender, EventArgs e) => SetResultIcon(CheckResultIcon.CheckRsl_5);
-		
-	   //检查数据是否被排序过
+
+		//检查数据是否被排序过
 		public bool IsOrderChanged()
 		{
 			bool isChanged = false;
@@ -407,6 +402,7 @@ namespace HkksUserControl
 			return isChanged;
 		}
 
+		//判断元素数据是否修改
 		private void DataCompare(SvgCompositionViewDto obj1, SvgCompositionViewDto obj2)
 		{
 			if (obj1.LayerDisplay != obj2.LayerDisplay) { obj1.ChangeType = ChangeType.Modified; }
@@ -418,7 +414,7 @@ namespace HkksUserControl
 		//判断数据是否被修改
 		public bool IsDataChanged()
 		{
-			if (_dtos.Count(x => x.ChangeType  != ChangeType.None) > 0) return true;
+			if (_dtos.Count(x => x.ChangeType != ChangeType.None) > 0) return true;
 			if (IsOrderChanged()) return true;
 			return false;
 		}
@@ -450,9 +446,10 @@ namespace HkksUserControl
 		}
 
 		//绑定数据
-		public async Task BindAsync(params SvgCompositionViewDto[] dtos)
+		public async Task BindAsync(List<SvgCompositionViewDto> dtos)
 		{
 			_dtos = null;
+			dtos.RemoveAll(x => x == null);
 			ClearDataSource();
 			int index = 0;
 			dtos.ToList().ForEach(x =>
@@ -460,7 +457,7 @@ namespace HkksUserControl
 				x.Id = index;
 				index++;
 			});
-			_dtos = dtos.ToList();
+			_dtos = dtos;
 			_currentdtos = _dtos.Select(d => (SvgCompositionViewDto)d.Clone()).ToList();
 			await InitDataSourceAsync(_dtos);
 		}
@@ -468,12 +465,12 @@ namespace HkksUserControl
 		//升序/降序排序
 		private async void lb_order_Click(object sender, EventArgs e)
 		{
-			if (_dataSouce.Count==0) return;
+			if (_dataSouce.Count == 0) return;
 			lb_order.Text = lb_order.Text.Contains("▼") ? "並び順▲" : "並び順▼";
 			if (_dtos == null) return;
 			_dtos.Reverse();
 			ClearDataSource();
-			await InitDataSourceAsync(_dtos);
+			await InitDataSourceAsync(_dtos.Where(x=>x.ChangeType != ChangeType.Deleted).ToList());
 		}
 
 		//修改元素数据
@@ -481,7 +478,14 @@ namespace HkksUserControl
 		{
 			if (_selectedItem == null) return;
 			_selectedItem.Update(dto);
-			DataCompare(_dtos.FirstOrDefault(x=>x.Id == _selectedItem.Id),dto);
+			DataCompare(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id), dto);
+		}
+
+		//刷新元素图片
+		public async Task RefreshItemContentImageAsync()
+		{
+			if (_selectedItem == null) return;
+			await _selectedItem.RefreshContentImageAsync();
 		}
 
 	}

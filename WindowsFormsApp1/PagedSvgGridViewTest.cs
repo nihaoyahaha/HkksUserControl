@@ -27,7 +27,7 @@ namespace WindowsFormsApp1
 		public void InitData()
 		{
 			List<SvgCompositionViewDto> dtos = new List<SvgCompositionViewDto>();
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 20; i++)
 			{
 				SvgCompositionViewDto dto = new SvgCompositionViewDto();
 				dto.ContentImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.svg");
@@ -35,7 +35,7 @@ namespace WindowsFormsApp1
 				dto.Remark = $"{i + 1}";
 				dtos.Add(dto);
 			}
-			svgGridView1.Bind(dtos.ToArray());
+			svgGridView1.Bind(dtos);
 		}
 
 		private void checkBox2_CheckedChanged(object sender, EventArgs e)

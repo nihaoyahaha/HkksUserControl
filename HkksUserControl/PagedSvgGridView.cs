@@ -58,6 +58,10 @@ namespace HkksUserControl
 			}
 		}
 
+		public List<SvgCompositionViewDto> DataSource {
+			get { return _dtos; }
+		}
+
 		public event EventHandler<EventArgs> ClickItem;
 
 		public PagedSvgGridView()
@@ -94,8 +98,7 @@ namespace HkksUserControl
 		private void SetItemDeletedState(SvgCompositionView item)
 		{
 			if (item == null) return;
-			item.SetDeletedState();
-			_dtos.FirstOrDefault(x => x.Id == item.Id).ChangeType = item.ChangeType;
+			_dtos.FirstOrDefault(x => x.Id == item.Id).ChangeType = item.SetDeletedState();
 		}
 
 		private void pic_remove_Click(object sender, EventArgs e)
@@ -106,7 +109,7 @@ namespace HkksUserControl
 
 		private async Task AddSvgCompositionViewAsync(SvgCompositionViewDto dto)
 		{
-			SvgCompositionView svgComposition = SvgCompositionView.Create(dto);
+			SvgCompositionView svgComposition =new SvgCompositionView(dto);
 			await svgComposition.SetContentImageAsync(dto.ContentImagePath);
 			Add(svgComposition, false);
 		}
@@ -535,15 +538,16 @@ namespace HkksUserControl
 			_selectedItem.SetNotesVisible(visible);
 		}
 
-		public void Bind(params SvgCompositionViewDto[] dtos)
+		public void Bind(List<SvgCompositionViewDto> dtos)
 		{
 			int index = 0;
+			dtos.RemoveAll(x => x == null);
 			dtos.ToList().ForEach(x =>
 			{
 				x.Id = index;
 				index++;
 			});
-			_dtos = dtos.ToList();
+			_dtos = dtos;
 			_currentdtos = _dtos.Select(d => (SvgCompositionViewDto)d.Clone()).ToList();
 			_dataPager = new DataPager<SvgCompositionViewDto>(_dtos, _pageSize);
 			pic_PageHome_Click(null, null);
@@ -563,6 +567,7 @@ namespace HkksUserControl
 			_selectedItem.Update(dto);
 			DataCompare(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id), dto);
 		}
+
 		private void DataCompare(SvgCompositionViewDto obj1, SvgCompositionViewDto obj2)
 		{
 			if (obj1.LayerDisplay != obj2.LayerDisplay) { obj1.ChangeType = ChangeType.Modified; }
@@ -570,5 +575,12 @@ namespace HkksUserControl
 			if (obj1.Remark != obj2.Remark) { obj1.ChangeType = ChangeType.Modified; }
 			if (obj1.Orientation != obj2.Orientation) { obj1.ChangeType = ChangeType.Modified; }
 		}
+
+		public async Task RefreshItemContentImageAsync()
+		{
+			if (_selectedItem == null) return;
+			await _selectedItem.RefreshContentImageAsync();
+		}
+
 	}
 }
