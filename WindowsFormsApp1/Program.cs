@@ -17,7 +17,7 @@ namespace WindowsFormsApp1
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new PagedSvgGridViewTest());
+            Application.Run(new SvgGridViewTest());
         }
     }
 }

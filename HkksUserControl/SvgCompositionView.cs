@@ -141,7 +141,7 @@ namespace HKKS
 			panel_Del.Location = new Point(1, 1);
 		}
 
-		public SvgCompositionView(SvgCompositionViewDto dto) : this() => Create(dto);
+		public SvgCompositionView(SvgCompositionViewDto dto) : this() => LoadFromDto(dto);
 
 		//初始化内容图片
 		private async Task InitContentImageAsync(string filePath)
@@ -157,8 +157,15 @@ namespace HKKS
 				_svgDoc = null;
 				pic_svgImage.Image = await Task.Run(() =>
 				{
-					_svgDoc = SvgDocument.Open(_contentImagePath);
-					return _svgDoc.Draw();
+					try
+					{
+						_svgDoc = SvgDocument.Open(_contentImagePath);
+						return _svgDoc.Draw();
+					}
+					catch (Exception)
+					{
+						throw new InvalidOperationException("SVG文件损坏,未正确加载。");
+					}
 				});
 			}
 			else
@@ -378,25 +385,24 @@ namespace HKKS
 		//设置检查结果图标
 		public void SetResultIcon(CheckResultIcon resultIcon) => ResultIcon = resultIcon;
 
-		public SvgCompositionView Create(SvgCompositionViewDto dto)
+		private void LoadFromDto(SvgCompositionViewDto dto)
 		{
-			SvgCompositionView svgComposition = new SvgCompositionView();
-			svgComposition.Id = dto.Id;
-			svgComposition.ResultIcon = dto.CheckResult;
-			svgComposition.Remark = dto.Remark;
-			svgComposition.Date = dto.CreateTime;
-			svgComposition.Orientation = dto.Orientation;
-			svgComposition.LayerDisplay = dto.LayerDisplay;
+			Id = dto.Id;
+			ResultIcon = dto.CheckResult;
+			Remark = dto.Remark;
+			Date = dto.CreateTime;
+			Orientation = dto.Orientation;
+			LayerDisplay = dto.LayerDisplay;
 			if (dto.ChangeType == ChangeType.Deleted) panel_Del.Visible = false;
-			return svgComposition;
 		}
 
-		public void Update(SvgCompositionViewDto dto)
+		public async Task UpdateFromDto(SvgCompositionViewDto dto)
 		{
 			ResultIcon = dto.CheckResult;
 			Remark = dto.Remark;
 			Orientation = dto.Orientation;
 			LayerDisplay = dto.LayerDisplay;
+			await RefreshContentImageAsync();
 		}
 	}
 }

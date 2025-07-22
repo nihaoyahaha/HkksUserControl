@@ -31,11 +31,11 @@ namespace WindowsFormsApp1
 		public async Task InitDataAsync()
 		{
 			List<SvgCompositionViewDto> dtos = new List<SvgCompositionViewDto>();
-			for (int i = 0; i < 50; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				SvgCompositionViewDto dto = new SvgCompositionViewDto();
 				dto.LayerDisplay = SvgLayerDisplay.OnlyNotesHide;
-				dto.ContentImagePath = @"C:\Users\whatr\Desktop\test3.jpg"; //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.svg");
+				dto.ContentImagePath = @"C:\Users\whatr\Desktop\test.svg"; //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.svg");
 				dto.CheckResult = CheckResultIcon.CheckRsl_1;
 				dto.Remark = $"{i + 1}";
 				dto.CreateTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
@@ -53,7 +53,7 @@ namespace WindowsFormsApp1
 			dto.CheckResult = CheckResultIcon.CheckRsl_1;
 			dto.Remark = "1";
 			dto.Orientation = "Left";
-			svgGridView1.UpdateItem(dto);
+			await svgGridView1.UpdateItem(dto);
 		}
 
 		private async void button2_Click(object sender, EventArgs e)

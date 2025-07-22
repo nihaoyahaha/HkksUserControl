@@ -248,7 +248,7 @@ namespace HKKS
 			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
 			SetNumInfo();
 
-			panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
+			//panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
 			panel_Main.ScrollControlIntoView(_selectedItem);
 		}
 
@@ -474,10 +474,10 @@ namespace HKKS
 		}
 
 		//修改元素数据
-		public void UpdateItem(SvgCompositionViewDto dto)
+		public async Task UpdateItem(SvgCompositionViewDto dto)
 		{
 			if (_selectedItem == null) return;
-			_selectedItem.Update(dto);
+			await _selectedItem.UpdateFromDto(dto);
 			DataCompare(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id), dto);
 		}
 

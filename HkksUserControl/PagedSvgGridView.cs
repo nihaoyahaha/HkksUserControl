@@ -561,10 +561,10 @@ namespace HKKS
 			await GoToAsync(_currentPage);
 		}
 
-		public void UpdateItem(SvgCompositionViewDto dto)
+		public async Task UpdateItem(SvgCompositionViewDto dto)
 		{
 			if (_selectedItem == null) return;
-			_selectedItem.Update(dto);
+			await _selectedItem.UpdateFromDto(dto);
 			DataCompare(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id), dto);
 		}
 
