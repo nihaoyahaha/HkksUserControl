@@ -11,9 +11,9 @@ using Svg;
 using System.IO;
 using System.Web;
 using System.Diagnostics;
-using CustomControlsImitatingUWP.Properties;
+using HKKS.Properties;
 
-namespace HkksUserControl
+namespace HKKS
 {
 	public partial class SvgCompositionView : UserControl
 	{

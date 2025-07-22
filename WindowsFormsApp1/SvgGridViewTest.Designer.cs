@@ -30,7 +30,7 @@
 		{
 			this.button1 = new System.Windows.Forms.Button();
 			this.button2 = new System.Windows.Forms.Button();
-			this.svgGridView1 = new HkksUserControl.SvgGridView();
+			this.svgGridView1 = new HKKS.SvgGridView();
 			this.SuspendLayout();
 			// 
 			// button1
@@ -83,7 +83,7 @@
 
 		#endregion
 		private System.Windows.Forms.Button button1;
-		private HkksUserControl.SvgGridView svgGridView1;
+		private HKKS.SvgGridView svgGridView1;
 		private System.Windows.Forms.Button button2;
 	}
 }

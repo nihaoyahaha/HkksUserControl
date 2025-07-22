@@ -1,4 +1,4 @@
-﻿namespace HkksUserControl
+﻿namespace HKKS
 {
 	partial class PagedSvgGridView
 	{
@@ -87,7 +87,7 @@
 			// 
 			// pic_tick
 			// 
-			this.pic_tick.Image = global::CustomControlsImitatingUWP.Properties.Resources.checkRsl_4;
+			this.pic_tick.Image = global::HKKS.Properties.Resources.checkRsl_4;
 			this.pic_tick.Location = new System.Drawing.Point(77, 4);
 			this.pic_tick.Name = "pic_tick";
 			this.pic_tick.Size = new System.Drawing.Size(16, 16);
@@ -98,7 +98,7 @@
 			// 
 			// pic_crosses
 			// 
-			this.pic_crosses.Image = global::CustomControlsImitatingUWP.Properties.Resources.checkRsl_2;
+			this.pic_crosses.Image = global::HKKS.Properties.Resources.checkRsl_2;
 			this.pic_crosses.Location = new System.Drawing.Point(41, 4);
 			this.pic_crosses.Name = "pic_crosses";
 			this.pic_crosses.Size = new System.Drawing.Size(16, 16);
@@ -109,7 +109,7 @@
 			// 
 			// pic_rect
 			// 
-			this.pic_rect.Image = global::CustomControlsImitatingUWP.Properties.Resources.checkRsl_1;
+			this.pic_rect.Image = global::HKKS.Properties.Resources.checkRsl_1;
 			this.pic_rect.Location = new System.Drawing.Point(3, 5);
 			this.pic_rect.Name = "pic_rect";
 			this.pic_rect.Size = new System.Drawing.Size(16, 16);
@@ -177,7 +177,7 @@
 			// 
 			this.pic_PageEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.pic_PageEnd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pic_PageEnd.Image = global::CustomControlsImitatingUWP.Properties.Resources.pageEnd;
+			this.pic_PageEnd.Image = global::HKKS.Properties.Resources.pageEnd;
 			this.pic_PageEnd.Location = new System.Drawing.Point(415, 310);
 			this.pic_PageEnd.Name = "pic_PageEnd";
 			this.pic_PageEnd.Size = new System.Drawing.Size(16, 16);
@@ -191,7 +191,7 @@
 			// 
 			this.pic_PageDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.pic_PageDown.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pic_PageDown.Image = global::CustomControlsImitatingUWP.Properties.Resources.pageRight;
+			this.pic_PageDown.Image = global::HKKS.Properties.Resources.pageRight;
 			this.pic_PageDown.Location = new System.Drawing.Point(385, 310);
 			this.pic_PageDown.Name = "pic_PageDown";
 			this.pic_PageDown.Size = new System.Drawing.Size(16, 16);
@@ -205,7 +205,7 @@
 			// 
 			this.pic_PageHome.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.pic_PageHome.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pic_PageHome.Image = global::CustomControlsImitatingUWP.Properties.Resources.pageHome;
+			this.pic_PageHome.Image = global::HKKS.Properties.Resources.pageHome;
 			this.pic_PageHome.Location = new System.Drawing.Point(267, 310);
 			this.pic_PageHome.Name = "pic_PageHome";
 			this.pic_PageHome.Size = new System.Drawing.Size(16, 16);
@@ -219,7 +219,7 @@
 			// 
 			this.pic_PageUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.pic_PageUp.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pic_PageUp.Image = global::CustomControlsImitatingUWP.Properties.Resources.pageLeft;
+			this.pic_PageUp.Image = global::HKKS.Properties.Resources.pageLeft;
 			this.pic_PageUp.Location = new System.Drawing.Point(297, 310);
 			this.pic_PageUp.Name = "pic_PageUp";
 			this.pic_PageUp.Size = new System.Drawing.Size(16, 16);
@@ -256,7 +256,7 @@
 			// 
 			// pic_remove
 			// 
-			this.pic_remove.Image = global::CustomControlsImitatingUWP.Properties.Resources.Del;
+			this.pic_remove.Image = global::HKKS.Properties.Resources.Del;
 			this.pic_remove.Location = new System.Drawing.Point(168, 10);
 			this.pic_remove.Name = "pic_remove";
 			this.pic_remove.Size = new System.Drawing.Size(16, 16);

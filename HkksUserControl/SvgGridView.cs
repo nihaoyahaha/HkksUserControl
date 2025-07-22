@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Diagnostics;
 
-namespace HkksUserControl
+namespace HKKS
 {
 	public partial class SvgGridView : UserControl
 	{

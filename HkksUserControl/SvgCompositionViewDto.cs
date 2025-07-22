@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HkksUserControl
+namespace HKKS
 {
 	//SvgCompositionView控件的数据传输对象
 	public class SvgCompositionViewDto : ICloneable

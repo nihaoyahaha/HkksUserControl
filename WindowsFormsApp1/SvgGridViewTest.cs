@@ -1,4 +1,4 @@
-﻿using HkksUserControl;
+﻿using HKKS;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

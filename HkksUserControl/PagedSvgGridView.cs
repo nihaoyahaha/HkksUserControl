@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Linq.Expressions;
 
-namespace HkksUserControl
+namespace HKKS
 {
 	public partial class PagedSvgGridView : UserControl
 	{

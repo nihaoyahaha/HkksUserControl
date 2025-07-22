@@ -32,7 +32,7 @@
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
 			this.checkBox3 = new System.Windows.Forms.CheckBox();
 			this.button1 = new System.Windows.Forms.Button();
-			this.svgGridView1 = new HkksUserControl.PagedSvgGridView();
+			this.svgGridView1 = new HKKS.PagedSvgGridView();
 			this.SuspendLayout();
 			// 
 			// checkBox1
@@ -118,7 +118,7 @@
 		private System.Windows.Forms.CheckBox checkBox1;
 		private System.Windows.Forms.CheckBox checkBox2;
 		private System.Windows.Forms.CheckBox checkBox3;
-		private HkksUserControl.PagedSvgGridView svgGridView1;
+		private HKKS.PagedSvgGridView svgGridView1;
 		private System.Windows.Forms.Button button1;
 	}
 }

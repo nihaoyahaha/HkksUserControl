@@ -33,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DrawKit">
-      <HintPath>C:\Users\whatr\Downloads\DrawKit-v1.2.1\DrawKit.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -94,12 +91,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HkksUserControl\HkksUserControl.csproj">
-      <Project>{5e48b9f5-a159-4c9a-9227-265be316674c}</Project>
-      <Name>HkksUserControl</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="checkRsl_5.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -109,6 +100,12 @@
     <Content Include="test3.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HkksUserControl\HKKS.csproj">
+      <Project>{5e48b9f5-a159-4c9a-9227-265be316674c}</Project>
+      <Name>HKKS</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

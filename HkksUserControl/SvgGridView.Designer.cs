@@ -1,4 +1,4 @@
-﻿namespace HkksUserControl
+﻿namespace HKKS
 {
 	partial class SvgGridView
 	{
@@ -88,7 +88,7 @@
 			// 
 			// pic_tick
 			// 
-			this.pic_tick.Image = global::CustomControlsImitatingUWP.Properties.Resources.checkRsl_4;
+			this.pic_tick.Image = global::HKKS.Properties.Resources.checkRsl_4;
 			this.pic_tick.Location = new System.Drawing.Point(77, 4);
 			this.pic_tick.Name = "pic_tick";
 			this.pic_tick.Size = new System.Drawing.Size(16, 16);
@@ -99,7 +99,7 @@
 			// 
 			// pic_crosses
 			// 
-			this.pic_crosses.Image = global::CustomControlsImitatingUWP.Properties.Resources.checkRsl_2;
+			this.pic_crosses.Image = global::HKKS.Properties.Resources.checkRsl_2;
 			this.pic_crosses.Location = new System.Drawing.Point(41, 4);
 			this.pic_crosses.Name = "pic_crosses";
 			this.pic_crosses.Size = new System.Drawing.Size(16, 16);
@@ -110,7 +110,7 @@
 			// 
 			// pic_rect
 			// 
-			this.pic_rect.Image = global::CustomControlsImitatingUWP.Properties.Resources.checkRsl_1;
+			this.pic_rect.Image = global::HKKS.Properties.Resources.checkRsl_1;
 			this.pic_rect.Location = new System.Drawing.Point(3, 5);
 			this.pic_rect.Name = "pic_rect";
 			this.pic_rect.Size = new System.Drawing.Size(16, 16);
@@ -121,7 +121,7 @@
 			// 
 			// pic_remove
 			// 
-			this.pic_remove.Image = global::CustomControlsImitatingUWP.Properties.Resources.Del;
+			this.pic_remove.Image = global::HKKS.Properties.Resources.Del;
 			this.pic_remove.Location = new System.Drawing.Point(168, 10);
 			this.pic_remove.Name = "pic_remove";
 			this.pic_remove.Size = new System.Drawing.Size(16, 16);
@@ -142,7 +142,7 @@
 			// pic_backward
 			// 
 			this.pic_backward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.pic_backward.Image = global::CustomControlsImitatingUWP.Properties.Resources.backward;
+			this.pic_backward.Image = global::HKKS.Properties.Resources.backward;
 			this.pic_backward.Location = new System.Drawing.Point(395, 9);
 			this.pic_backward.Name = "pic_backward";
 			this.pic_backward.Size = new System.Drawing.Size(16, 16);
@@ -156,7 +156,7 @@
 			// 
 			this.pic_forward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.pic_forward.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pic_forward.Image = global::CustomControlsImitatingUWP.Properties.Resources.forward;
+			this.pic_forward.Image = global::HKKS.Properties.Resources.forward;
 			this.pic_forward.Location = new System.Drawing.Point(371, 9);
 			this.pic_forward.Name = "pic_forward";
 			this.pic_forward.Size = new System.Drawing.Size(16, 16);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HkksUserControl
+namespace HKKS
 {
 	public class DataPager<T>
 	{

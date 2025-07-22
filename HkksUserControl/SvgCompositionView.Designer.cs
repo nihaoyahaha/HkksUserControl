@@ -1,4 +1,4 @@
-﻿namespace HkksUserControl
+﻿namespace HKKS
 {
 	partial class SvgCompositionView
 	{
