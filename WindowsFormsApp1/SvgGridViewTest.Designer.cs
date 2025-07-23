@@ -46,6 +46,7 @@
 			// 
 			// button2
 			// 
+			this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.button2.Location = new System.Drawing.Point(826, 93);
 			this.button2.Name = "button2";
 			this.button2.Size = new System.Drawing.Size(75, 23);
@@ -60,19 +61,18 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.svgGridView1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.svgGridView1.Location = new System.Drawing.Point(12, 12);
+			this.svgGridView1.Location = new System.Drawing.Point(12, 29);
 			this.svgGridView1.Name = "svgGridView1";
-			this.svgGridView1.Size = new System.Drawing.Size(743, 525);
-			this.svgGridView1.TabIndex = 2;
-			this.svgGridView1.Load += new System.EventHandler(this.svgGridView1_Load);
+			this.svgGridView1.Size = new System.Drawing.Size(788, 527);
+			this.svgGridView1.TabIndex = 4;
 			// 
 			// SvgGridViewTest
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(913, 584);
-			this.Controls.Add(this.button2);
 			this.Controls.Add(this.svgGridView1);
+			this.Controls.Add(this.button2);
 			this.Controls.Add(this.button1);
 			this.Name = "SvgGridViewTest";
 			this.Text = "SvgGridViewTest";
@@ -83,7 +83,7 @@
 
 		#endregion
 		private System.Windows.Forms.Button button1;
-		private HKKS.SvgGridView svgGridView1;
 		private System.Windows.Forms.Button button2;
+		private HKKS.SvgGridView svgGridView1;
 	}
 }

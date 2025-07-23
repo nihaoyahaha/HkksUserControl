@@ -23,7 +23,7 @@ namespace WindowsFormsApp1
 		{
 			await InitDataAsync();
 			svgGridView1.ClickItem += (a, b) => {
-				var item = a as SvgCompositionView;
+				var item = a as SvgCompositionViewDto;
 				//MessageBox.Show(item.Remark);
 			};
 		}
@@ -31,11 +31,11 @@ namespace WindowsFormsApp1
 		public async Task InitDataAsync()
 		{
 			List<SvgCompositionViewDto> dtos = new List<SvgCompositionViewDto>();
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 120; i++)
 			{
 				SvgCompositionViewDto dto = new SvgCompositionViewDto();
 				dto.LayerDisplay = SvgLayerDisplay.OnlyNotesHide;
-				dto.ContentImagePath = @"C:\Users\whatr\Desktop\test.svg"; //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.svg");
+				dto.ContentImagePath = @"C:\Users\whatr\Desktop\test3.jpg"; //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.svg");
 				dto.CheckResult = CheckResultIcon.CheckRsl_1;
 				dto.Remark = $"{i + 1}";
 				dto.CreateTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");

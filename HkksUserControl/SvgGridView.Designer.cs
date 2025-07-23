@@ -29,7 +29,6 @@
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SvgGridView));
-			this.panel_Main = new System.Windows.Forms.FlowLayoutPanel();
 			this.panel_Top = new System.Windows.Forms.Panel();
 			this.pic_triangle = new System.Windows.Forms.PictureBox();
 			this.pic_tick = new System.Windows.Forms.PictureBox();
@@ -40,6 +39,7 @@
 			this.pic_backward = new System.Windows.Forms.PictureBox();
 			this.pic_forward = new System.Windows.Forms.PictureBox();
 			this.lb_order = new System.Windows.Forms.Label();
+			this.panel_Main = new System.Windows.Forms.FlowLayoutPanel();
 			this.panel_Top.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pic_triangle)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pic_tick)).BeginInit();
@@ -49,20 +49,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.pic_backward)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pic_forward)).BeginInit();
 			this.SuspendLayout();
-			// 
-			// panel_Main
-			// 
-			this.panel_Main.AllowDrop = true;
-			this.panel_Main.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.panel_Main.AutoScroll = true;
-			this.panel_Main.Location = new System.Drawing.Point(3, 32);
-			this.panel_Main.Name = "panel_Main";
-			this.panel_Main.Padding = new System.Windows.Forms.Padding(3);
-			this.panel_Main.Size = new System.Drawing.Size(417, 282);
-			this.panel_Main.TabIndex = 0;
-			this.panel_Main.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Main_Paint);
 			// 
 			// panel_Top
 			// 
@@ -132,10 +118,9 @@
 			// 
 			// lb_numInfo
 			// 
-			this.lb_numInfo.AutoSize = true;
-			this.lb_numInfo.Location = new System.Drawing.Point(221, 13);
+			this.lb_numInfo.Location = new System.Drawing.Point(211, 13);
 			this.lb_numInfo.Name = "lb_numInfo";
-			this.lb_numInfo.Size = new System.Drawing.Size(23, 12);
+			this.lb_numInfo.Size = new System.Drawing.Size(54, 11);
 			this.lb_numInfo.TabIndex = 2;
 			this.lb_numInfo.Text = "0/0";
 			// 
@@ -168,7 +153,6 @@
 			// 
 			// lb_order
 			// 
-			this.lb_order.AutoSize = true;
 			this.lb_order.Location = new System.Drawing.Point(268, 12);
 			this.lb_order.Name = "lb_order";
 			this.lb_order.Size = new System.Drawing.Size(53, 12);
@@ -176,18 +160,31 @@
 			this.lb_order.Text = "並び順▲";
 			this.lb_order.Click += new System.EventHandler(this.lb_order_Click);
 			// 
+			// panel_Main
+			// 
+			this.panel_Main.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.panel_Main.AutoScroll = true;
+			this.panel_Main.Location = new System.Drawing.Point(3, 31);
+			this.panel_Main.Name = "panel_Main";
+			this.panel_Main.Padding = new System.Windows.Forms.Padding(3);
+			this.panel_Main.Size = new System.Drawing.Size(417, 283);
+			this.panel_Main.TabIndex = 16;
+			this.panel_Main.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Main_Paint);
+			// 
 			// SvgGridView
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.Controls.Add(this.panel_Main);
 			this.Controls.Add(this.lb_order);
 			this.Controls.Add(this.pic_backward);
 			this.Controls.Add(this.pic_forward);
 			this.Controls.Add(this.lb_numInfo);
 			this.Controls.Add(this.pic_remove);
 			this.Controls.Add(this.panel_Top);
-			this.Controls.Add(this.panel_Main);
 			this.Name = "SvgGridView";
 			this.Size = new System.Drawing.Size(423, 317);
 			this.panel_Top.ResumeLayout(false);
@@ -205,8 +202,6 @@
 		}
 
 		#endregion
-
-		private System.Windows.Forms.FlowLayoutPanel panel_Main;
 		private System.Windows.Forms.Panel panel_Top;
 		private System.Windows.Forms.PictureBox pic_rect;
 		private System.Windows.Forms.PictureBox pic_triangle;
@@ -217,5 +212,6 @@
 		private System.Windows.Forms.PictureBox pic_backward;
 		private System.Windows.Forms.PictureBox pic_forward;
 		private System.Windows.Forms.Label lb_order;
+		private System.Windows.Forms.FlowLayoutPanel panel_Main;
 	}
 }

@@ -126,7 +126,7 @@ namespace HKKS
 			Cursor = Cursors.WaitCursor;
 			foreach (var item in dtos)
 			{
-				await AddSvgCompositionViewAsync(item);
+				await AddSvgCompositionViewAsync(item);		
 			}
 			SetControlEnable(true);
 			Cursor = Cursors.Default;
@@ -240,16 +240,13 @@ namespace HKKS
 		//元素选中事件
 		private void OnSelected(object sender, MouseEventArgs e)
 		{
-			ClickItem?.Invoke(sender, e);
 			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
 			if (obj != null) obj.Selected = false;
 			_selectedItem = sender as SvgCompositionView;
-			_selectedItem.Selected = true;
+			ClickItem?.Invoke(_dtos.FirstOrDefault(x => x.Id == _selectedItem.Id), e);
 			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
 			SetNumInfo();
-
-			//panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
-			panel_Main.ScrollControlIntoView(_selectedItem);
+			panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);
 		}
 
 		//拖动进入元素时触发
@@ -274,6 +271,7 @@ namespace HKKS
 			_insertDirection = SvgCompositionViewInsertDirection.Null;
 			_rectDragEnter = Rectangle.Empty;
 			_isDragOver = false;
+			
 			panel_Main.Invalidate();
 		}
 
@@ -294,7 +292,7 @@ namespace HKKS
 			Point clientPoint = targetItem.PointToClient(new Point(e.X, e.Y));
 			bool isLeftSide = clientPoint.X < targetItem.Width / 2;
 			_insertDirection = isLeftSide ? SvgCompositionViewInsertDirection.Left : SvgCompositionViewInsertDirection.Right;
-			_rectDragEnter = new Rectangle(targetItem.Location, targetItem.Size);
+			_rectDragEnter = new Rectangle(targetItem.Location, targetItem.Size);		
 			panel_Main.Invalidate();
 		}
 
@@ -487,6 +485,21 @@ namespace HKKS
 			if (_selectedItem == null) return;
 			await _selectedItem.RefreshContentImageAsync();
 		}
+
+		private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
+		{
+
+
+			foreach (Control ctrl in panel_Main.Controls)
+			{
+				var location = ctrl.Location;
+				ctrl.Top = e.NewValue;
+
+			}
+
+			panel_Main.Refresh();
+		}
+
 
 	}
 }

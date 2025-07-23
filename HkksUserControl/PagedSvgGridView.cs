@@ -383,10 +383,7 @@ namespace HKKS
 			var obj = _dataSouce.FirstOrDefault(x => x.Selected && !ReferenceEquals(x, sender));
 			if (obj != null) obj.Selected = false;
 			_selectedItem = (SvgCompositionView)sender;
-			_selectedItem.Selected = true;
-
 			if(_dtos.FirstOrDefault(x=>x.Id == _selectedItem.Id).ChangeType != ChangeType.Deleted) ClickItem?.Invoke(sender, e);
-
 			_selectedIndex = _dataSouce.IndexOf(_selectedItem);
 			SetNumInfo();
 			panel_Main.DoDragDrop(_selectedItem, DragDropEffects.Move);

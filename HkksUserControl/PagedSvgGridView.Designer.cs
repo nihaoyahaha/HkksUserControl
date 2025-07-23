@@ -120,10 +120,9 @@
 			// 
 			// lb_numInfo
 			// 
-			this.lb_numInfo.AutoSize = true;
 			this.lb_numInfo.Location = new System.Drawing.Point(206, 13);
 			this.lb_numInfo.Name = "lb_numInfo";
-			this.lb_numInfo.Size = new System.Drawing.Size(23, 12);
+			this.lb_numInfo.Size = new System.Drawing.Size(60, 12);
 			this.lb_numInfo.TabIndex = 2;
 			this.lb_numInfo.Text = "0/0";
 			// 
@@ -267,8 +266,7 @@
 			// 
 			// lb_order
 			// 
-			this.lb_order.AutoSize = true;
-			this.lb_order.Location = new System.Drawing.Point(265, 12);
+			this.lb_order.Location = new System.Drawing.Point(272, 12);
 			this.lb_order.Name = "lb_order";
 			this.lb_order.Size = new System.Drawing.Size(53, 12);
 			this.lb_order.TabIndex = 16;
