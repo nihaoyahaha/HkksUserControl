@@ -486,20 +486,5 @@ namespace HKKS
 			await _selectedItem.RefreshContentImageAsync();
 		}
 
-		private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
-		{
-
-
-			foreach (Control ctrl in panel_Main.Controls)
-			{
-				var location = ctrl.Location;
-				ctrl.Top = e.NewValue;
-
-			}
-
-			panel_Main.Refresh();
-		}
-
-
 	}
 }

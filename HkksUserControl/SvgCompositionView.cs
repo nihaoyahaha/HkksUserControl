@@ -131,7 +131,6 @@ namespace HKKS
 		public event EventHandler<DragEventArgs> SvgCompositionViewDragEnter;
 		public event EventHandler<DragEventArgs> SvgCompositionViewDragOver;
 		public event EventHandler<EventArgs> SvgCompositionViewDragLeave;
-		public event EventHandler<MouseEventArgs> SvgCompositionViewMouseUp;
 
 		public SvgCompositionView()
 		{
